@@ -11,6 +11,7 @@ const connectors = {
 };
 export default function App({ Component, pageProps }: AppProps) {
   return (
+    // change children props
     <ThirdwebWeb3Provider
       supportedChainIds={supportedChainIds}
       connectors={connectors}

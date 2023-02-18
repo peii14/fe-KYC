@@ -18,7 +18,7 @@ export default function Home() {
   const router = useRouter();
   useEffect(() => {
     if (address) {
-      router.push("/customer/");
+      router.push(`/${address}`);
     }
   }, [address, chainId, router]);
 
