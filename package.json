@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@3rdweb/hooks": "^1.9.2",
     "@headlessui/react": "^1.7.11",
     "@next/font": "13.1.6",
     "@types/node": "18.13.0",

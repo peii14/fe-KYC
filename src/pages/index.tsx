@@ -7,13 +7,21 @@ import { useEffect, useState } from "react";
 import AnimateHeight from "react-animate-height";
 import { useForm } from "react-hook-form";
 import Input from "@/components/shared/Input";
-export default function Home() {
-  const [isCustomer, setCustomer] = useState(false);
-  const [isBankEntity, setBankEntity] = useState(false);
+import { useWeb3 } from "@3rdweb/hooks";
+import { useRouter } from "next/navigation";
 
+export default function Home() {
+  const { address, chainId, connectWallet } = useWeb3();
   const [landingHeight, setLandingHeight]: any = useState("auto");
   const [bankHeight, setBankHeight]: any = useState(0);
-  useEffect(() => {}, [isCustomer]);
+
+  const router = useRouter();
+  useEffect(() => {
+    if (address) {
+      router.push("/customer/");
+    }
+  }, [address, chainId, router]);
+
   const {
     handleSubmit,
     register,
@@ -48,7 +56,12 @@ export default function Home() {
               <div className="mt-3">
                 <h3 className="font-semibold">Log in as</h3>
                 <div className="flex flex-col my-5 space-y-2">
-                  <Button type={1}>
+                  <Button
+                    type={1}
+                    onClick={() => {
+                      connectWallet("injected");
+                    }}
+                  >
                     <BsFillPeopleFill />
                     <p>Customer</p>
                   </Button>
@@ -56,7 +69,6 @@ export default function Home() {
                   <Button
                     type={1}
                     onClick={() => {
-                      setBankEntity(true);
                       setLandingHeight(0);
                       setBankHeight("auto");
                     }}
