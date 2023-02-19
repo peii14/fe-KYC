@@ -50,7 +50,7 @@ const Customer = ({ wallet_address }) => {
       <Image
         alt="passport"
         src={file.preview}
-        className="object-cover mx-auto"
+        className="object-cover mx-auto mt-1"
         width={420}
         height={500}
         onLoad={() => {
@@ -65,7 +65,6 @@ const Customer = ({ wallet_address }) => {
     formState: { errors },
   }: any = useForm();
   useEffect(() => {
-    console.log(address);
     if (wallet_address != address) {
       router.push("/");
     } else {
@@ -89,7 +88,22 @@ const Customer = ({ wallet_address }) => {
           <section className="">
             <Card>
               <div className="flex justify-between items-center">
-                <h1>New Customer</h1>
+                <div className="h-10 overflow-y-hidden">
+                  <h1
+                    className={`duration-200 ${
+                      toValidate ? "-translate-y-full" : ""
+                    }`}
+                  >
+                    New Customer
+                  </h1>
+                  <h1
+                    className={`duration-200 ${
+                      toValidate ? "-translate-y-full" : ""
+                    }`}
+                  >
+                    Verification
+                  </h1>
+                </div>
                 <p>Customer Registration Form (New Customers Only)</p>
               </div>
               <AnimateHeight
@@ -168,7 +182,7 @@ const Customer = ({ wallet_address }) => {
                   <div>
                     <p className="mb-5">Live selfies</p>
                     <div
-                      className={`border-2 p-1 border-red-700 h-[310px] flex items-center`}
+                      className={`w-full border-2 p-1 border-red-700 h-[310px] flex items-center`}
                     >
                       {isCameraStart ? (
                         <>
@@ -184,7 +198,7 @@ const Customer = ({ wallet_address }) => {
                       ) : (
                         <>
                           <Button
-                            className="m-auto w-1/2"
+                            className="m-auto w-1/3"
                             type={1}
                             onClick={() => setCameraStart(true)}
                           >

@@ -32,7 +32,7 @@ const Layout = ({
           isAuth ? "grid grid-cols-6 space-x-3 bg-gray-200 w-screen " : "first:hidden"
         }`}
       >
-        <Sidebar />
+        <Sidebar/>
         <div className={`${poppins.className} col-span-5 pr-20`}>
           {children}
         </div>
