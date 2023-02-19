@@ -13,7 +13,7 @@ const Button = ({
     <>
       <button
         onClick={onClick}
-        className={`w-full border-2 border-dark duration-200 ${className} ${
+        className={`w-full  border-2 border-dark duration-200 ${className} ${
           type === 1
             ? "bg-dark py-3 text-light hover:text-dark hover:shadow-theme hover:bg-light"
             : "bg-light py-3 text-dark hover:shadow-theme "

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import {
   AiTwotoneHome,
   AiFillCheckSquare,
@@ -7,9 +8,10 @@ import {
 import { FaHistory } from "react-icons/fa";
 
 const Sidebar = () => {
+  const route = useRouter();
   return (
     <>
-      <nav className="w-1/6 h-screen">
+      <nav className={`h-screen ${route.route === "/" ? "hidden" : "block"}`}>
         <ul className="py-20">
           <li>
             <Link

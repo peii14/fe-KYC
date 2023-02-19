@@ -40,7 +40,7 @@ export default function Home() {
 
   return (
     <>
-      <Layout>
+      <Layout isAuth={false}>
         <Seo title="KYC" />
         <section className="h-screen grid grid-cols-2 items-center">
           <div className={`w-2/3 mx-auto `}>

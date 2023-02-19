@@ -29,11 +29,13 @@ const Layout = ({
       <Navbar />
       <div
         className={`${
-          isAuth ? "flex flex-row space-x-5 bg-gray-200 " : "first:hidden"
+          isAuth ? "grid grid-cols-6 space-x-3 bg-gray-200 w-screen " : "first:hidden"
         }`}
       >
         <Sidebar />
-        <div className={poppins.className}>{children}</div>
+        <div className={`${poppins.className} col-span-5 pr-20`}>
+          {children}
+        </div>
       </div>
       <Footer />
     </>
