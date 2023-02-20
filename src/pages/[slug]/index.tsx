@@ -12,8 +12,12 @@ import { AiFillFileAdd } from "react-icons/ai";
 import AnimateHeight from "react-animate-height";
 import Webcam from "react-webcam";
 import Image from "next/image";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 import { useDropzone } from "react-dropzone";
+import BinaryPicker from "@/components/shared/BinaryPicker";
 const videoConstraints = {
   width: 1280,
   height: 720,
@@ -42,7 +46,9 @@ const Customer = ({ wallet_address }) => {
 
   const [documentHeight, setDocHeigth]: any = useState("auto");
   const [verificationHeight, setVerHeigth]: any = useState(0);
-
+  const [birthDate, setBirthDate] = useState(new Date());
+  const [passportDate, setPassportDate] = useState(new Date());
+  const [gender, setGender] = useState("");
   const [isCameraStart, setCameraStart] = useState(false);
   const [toValidate, setValidate] = useState(false);
   const thumbs = files.map((file) => (
@@ -128,13 +134,15 @@ const Customer = ({ wallet_address }) => {
                     placeholder={"Indonesia"}
                   />
                   {/* change to DOB */}
-                  <Input
-                    label="Nationality"
-                    entity="nationality"
-                    errors={errors}
-                    register={register}
-                    placeholder={"Indonesia"}
-                  />
+                  <div>
+                    <p>Date of birth</p>
+                    <div className="px-3 py-2 my-2 w-full border-2 rounded-lg">
+                      <DatePicker
+                        selected={birthDate}
+                        onChange={(date) => setBirthDate(date)}
+                      />
+                    </div>
+                  </div>
                   <Input
                     label="Passport ID"
                     entity="passport_id"
@@ -143,21 +151,20 @@ const Customer = ({ wallet_address }) => {
                     placeholder={"X9281028"}
                   />
                   {/* change to male or female only */}
-                  <Input
-                    label="Passport ID"
-                    entity="passport_id"
-                    errors={errors}
-                    register={register}
-                    placeholder={"X9281028"}
-                  />
+                  <div>
+                    <p className="mb-3">Gender</p>
+                    <BinaryPicker />
+                  </div>
                   {/* datepicker */}
-                  <Input
-                    label="Passport ID"
-                    entity="passport_id"
-                    errors={errors}
-                    register={register}
-                    placeholder={"X9281028"}
-                  />
+                  <div>
+                    <p>Passport expiry date</p>
+                    <div className="px-3 py-2 my-2 w-full border-2 rounded-lg">
+                      <DatePicker
+                        selected={passportDate}
+                        onChange={(date) => setPassportDate(date)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </AnimateHeight>
               <AnimateHeight
@@ -197,13 +204,15 @@ const Customer = ({ wallet_address }) => {
                         </>
                       ) : (
                         <>
-                          <Button
-                            className="m-auto w-1/3"
-                            type={1}
-                            onClick={() => setCameraStart(true)}
-                          >
-                            <p>Start Camera</p>
-                          </Button>
+                          <div className="w-1/2 mx-auto">
+                            <Button
+                              className="m-auto"
+                              type={1}
+                              onClick={() => setCameraStart(true)}
+                            >
+                              <p>Start Camera</p>
+                            </Button>
+                          </div>
                         </>
                       )}
                     </div>
@@ -214,37 +223,45 @@ const Customer = ({ wallet_address }) => {
           </section>
 
           <div
-            className={`items-center py-10 gap-10 flex relative overflow-x-hidden px-3  ${
-              toValidate ? " justify-between" : ""
+            className={`items-center py-10 flex flex-row relative overflow-x-hidden px-3  ${
+              toValidate ? " justify-between gap-10" : ""
             }`}
           >
-            <Button
-              type={toValidate ? 2 : 1}
-              className={`duration-300 h-14 ${toValidate ? "w-56" : "w-full"}`}
-              onClick={() => {
-                setValidate(!toValidate);
-              }}
-            >
-              <MdOutlineNavigateNext
-                className={`text-2xl duration-300 ${
-                  toValidate ? "rotate-180" : ""
+            <div className={` duration-700 ${toValidate ? "w-56" : " w-full"}`}>
+              <Button
+                type={toValidate ? 2 : 1}
+                className={` h-14 `}
+                onClick={() => {
+                  setValidate(!toValidate);
+                }}
+              >
+                <MdOutlineNavigateNext
+                  className={`text-2xl duration-300 ${
+                    toValidate ? "rotate-180" : ""
+                  }`}
+                />
+                <p className={` ${toValidate ? "w-0 hidden" : ""}`}>
+                  To verify
+                </p>
+                <p className={`${toValidate ? "" : "hidden"}`}>Back</p>
+              </Button>
+            </div>
+            <div className={``}>
+              <Button
+                type={1}
+                className={`h-14 duration-700 max-w-xs w-60 ${
+                  toValidate
+                    ? ""
+                    : "right-0 translate-x-full -translate-y-1/2 top-1/2 absolute"
                 }`}
-              />
-              <p className={` ${toValidate ? "w-0 hidden" : ""}`}>To verify</p>
-              <p className={`${toValidate ? "" : "hidden"}`}>Back</p>
-            </Button>
-            <Button
-              type={1}
-              className={`h-14 duration-300 w-56  ${
-                toValidate ? "" : "right-0 translate-x-full absolute"
-              }`}
-              onClick={() => {
-                setValidate(true);
-              }}
-            >
-              <AiFillFileAdd className="text-xl" />
-              <p>Request verification</p>
-            </Button>
+                onClick={() => {
+                  setValidate(true);
+                }}
+              >
+                <AiFillFileAdd className="text-xl" />
+                <p>Request verification</p>
+              </Button>
+            </div>
           </div>
         </main>
       </Layout>
