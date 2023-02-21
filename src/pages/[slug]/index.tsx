@@ -10,19 +10,15 @@ import { useForm } from "react-hook-form";
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { AiFillFileAdd } from "react-icons/ai";
 import AnimateHeight from "react-animate-height";
-import Webcam from "react-webcam";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
-
+import { loadModels } from "@/helper/faceRecog";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { useDropzone } from "react-dropzone";
 import BinaryPicker from "@/components/shared/BinaryPicker";
-const videoConstraints = {
-  width: 1280,
-  height: 720,
-  facingMode: "user",
-};
+import FaceRecognition from "@/components/faceRecognition";
+
 const Customer = ({ wallet_address }) => {
   const [files, setFiles] = useState([]);
 
@@ -51,18 +47,24 @@ const Customer = ({ wallet_address }) => {
   const [gender, setGender] = useState("");
   const [isCameraStart, setCameraStart] = useState(false);
   const [toValidate, setValidate] = useState(false);
+
   const thumbs = files.map((file) => (
-    <div className="w-full" key={file.name}>
+    <div className="w-full relative mt-1" key={file.name}>
       <Image
+        id="first-img"
         alt="passport"
         src={file.preview}
-        className="object-cover mx-auto mt-1"
-        width={420}
+        className="object-cover mx-auto w-full "
+        width={450}
         height={500}
         onLoad={() => {
           URL.revokeObjectURL(file.preview);
         }}
       />
+      <canvas
+        id="canvas1"
+        className="absolute w-full h-full z-30 top-0 mt-1 right-0"
+      ></canvas>
     </div>
   ));
   const {
@@ -74,6 +76,7 @@ const Customer = ({ wallet_address }) => {
     if (wallet_address != address) {
       router.push("/");
     } else {
+      loadModels();
       setAuth(true);
     }
   }, [wallet_address, router, address]);
@@ -189,18 +192,13 @@ const Customer = ({ wallet_address }) => {
                   <div>
                     <p className="mb-5">Live selfies</p>
                     <div
-                      className={`w-full border-2 p-1 border-red-700 h-[310px] flex items-center`}
+                      className={`h-[350px] flex items-center ${
+                        isCameraStart ? "" : "border-4 border-red-700"
+                      }`}
                     >
                       {isCameraStart ? (
                         <>
-                          <Webcam
-                            audio={false}
-                            height={720}
-                            // ref={webcamRef}
-                            screenshotFormat="image/jpeg"
-                            width={1280}
-                            videoConstraints={videoConstraints}
-                          />
+                          <FaceRecognition passport={files[0].preview} />
                         </>
                       ) : (
                         <>
@@ -249,7 +247,7 @@ const Customer = ({ wallet_address }) => {
             <div className={``}>
               <Button
                 type={1}
-                className={`h-14 duration-700 max-w-xs w-60 ${
+                className={`h-14 px-5 duration-300 max-w-xs w-60 ${
                   toValidate
                     ? ""
                     : "right-0 translate-x-full -translate-y-1/2 top-1/2 absolute"
