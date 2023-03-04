@@ -54,6 +54,8 @@ export const loadModels = async () => {
     //       withScore: false,
     //     });
 
+    console.log(faces)
+
     faceapi.draw.drawFaceLandmarks(canvas2,matched)
     
       //   this.closeWebcam();
@@ -76,7 +78,7 @@ export const checkMatch = async ({setFace1,setFaceFound}:checkMatchProps) => {
     const canvas1: any = document.getElementById("canvas1");
 
     faces = faceapi.resizeResults(faces, { height: 150, width: 300 });
-    faceapi.draw.drawDetections(canvas1, faces);
+    // faceapi.draw.drawDetections(canvas1, faces);
     faceapi.draw.drawFaceLandmarks(canvas1, faces);
     switch (faces.length) {
       case 0:
