@@ -142,3 +142,83 @@ export function token_transfer_transactions(address: string, data: any) {
             return ERC20_contract_tnx_fields
     }
 }
+export function normalTransactions(data:any,address: string){
+        let receivedTransactions = 0;
+        let sentTransactions = 0;
+        let createdContracts = 0;
+        let minValReceived = 0;
+        let maxValReceived = 0;
+        let avgValReceived = 0;
+        let minValSent = 0;
+        let maxValSent = 0;
+        let avgValSent = 0;
+        let minValSentContract = 0;
+        let maxValSentContract = 0;
+        let avgValSentContract = 0;
+        const timestamp: any[] = [];
+        const recipients: string[] = [];
+        const timeDiffSent: number[] = [];
+        const timeDiffReceive: number[] = [];
+        const receivedFromAddresses: string[] = [];
+        const sentToAddresses: string[] = [];
+        const sentToContracts: string[] = [];
+        const valueSent: number[] = [];
+        const valueReceived: number[] = [];
+        const valueSentContracts: number[] = [];
+  
+        if (data.status !== '0') {
+          for (let tnx = 0; tnx < data.result.length; tnx++) {
+            if (data.result[tnx].isError === '1') {
+              continue;
+            }
+            timestamp.push(parseInt(data.result[tnx].timeStamp));
+            if (data.result[tnx].to === address) {
+              receivedTransactions += 1;
+              receivedFromAddresses.push(data.result[tnx].from);
+              valueReceived.push(parseInt(data.result[tnx].value) / 1000000000000000000);
+              if (receivedTransactions > 0) {
+                timeDiffReceive.push((new Date(parseInt(timestamp[tnx]) * 1000).getTime() - new Date(parseInt(timestamp[tnx - 1]) * 1000).getTime()) / 1000 / 60);
+              }
+            }
+            if (data.result[tnx].from === address) {
+              sentTransactions += 1;
+              sentToAddresses.push(data.result[tnx].to);
+              valueSent.push(parseInt(data.result[tnx].value) / 1000000000000000000);
+              if (sentTransactions > 0) {
+                timeDiffSent.push((new Date(parseInt(timestamp[tnx]) * 1000).getTime() - new Date(parseInt(timestamp[tnx - 1]) * 1000).getTime()) / 1000 / 60);
+              }
+            }
+  
+            if (data.result[tnx].contractAddress !== '') {
+              createdContracts += 1;
+              sentToContracts.push(data.result[tnx].contractAddress);
+              valueSentContracts.push(parseInt(data.result[tnx].value) / 1000000000000000000);
+            }
+          }
+  
+            const totalTnx = sentTransactions + receivedTransactions + createdContracts;
+            const totalEtherReceived = valueReceived.reduce((a, b) => a + b, 0);
+            const totalEtherSent = valueSent.reduce((a, b) => a + b, 0);
+            const totalEtherSentContracts = valueSentContracts.reduce((a, b) => a + b, 0);
+            const totalEtherBalance = totalEtherReceived - totalEtherSent - totalEtherSentContracts
+            const avgTimeBetweenSentTnx = avgTime(timeDiffSent)
+            const avgTimeBetweenRecTnx = avgTime(timeDiffReceive)
+            const [numUniqSentAddress, numUniqRecAddress] = uniq_addresses(sentToAddresses, receivedFromAddresses)
+            const [minValReceived, maxValReceived, avgValReceived] = min_max_avg(valueReceived)
+            const [minValSent, maxValSent, avgValSent] = min_max_avg(valueSent)
+            const [minValSentContract, maxValSentContract, avgValSentContract] = min_max_avg(valueSentContracts)
+            const timeDiffBetweenFirstAndLast = timeDiffFirstLast(timestamp)
+
+            const transaction_fields = [avgTimeBetweenSentTnx, avgTimeBetweenRecTnx, timeDiffBetweenFirstAndLast,
+                sentTransactions,
+                receivedTransactions, createdContracts,
+                numUniqRecAddress, numUniqSentAddress,
+                minValReceived, maxValReceived, avgValReceived,
+                minValSent, maxValSent, avgValSent,
+                minValSentContract, maxValSentContract, avgValSentContract,
+                totalTnx, totalEtherSent, totalEtherReceived, totalEtherSentContracts,
+                totalEtherBalance]
+            return transaction_fields
+        }
+    }
+  
