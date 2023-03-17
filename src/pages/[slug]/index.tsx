@@ -5,28 +5,28 @@ import Card from "@/components/shared/Card";
 import Input from "@/components/shared/Input";
 import { useWeb3 } from "@3rdweb/hooks";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { AiFillFileAdd } from "react-icons/ai";
 import AnimateHeight from "react-animate-height";
-import Image from "next/image";
 import DatePicker from "react-datepicker";
 import { loadModels } from "@/helper/faceRecog";
 import "react-datepicker/dist/react-datepicker.css";
-
 import { useDropzone } from "react-dropzone";
 import BinaryPicker from "@/components/shared/BinaryPicker";
 import FaceRecognition from "@/components/faceRecognition";
 
-const Customer = ({ wallet_address }) => {
+import Thumbs from "@/components/shared/Thumbs";
+
+function Customer({ wallet_address }) {
   const [files, setFiles] = useState([]);
 
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     accept: {
       "image/*": [],
     },
-    onDrop: (acceptedFiles) => {
+    onDrop: async (acceptedFiles: any) => {
       setFiles(
         acceptedFiles.map((file) =>
           Object.assign(file, {
@@ -39,6 +39,7 @@ const Customer = ({ wallet_address }) => {
   const [isAuth, setAuth] = useState(false);
   const { address } = useWeb3();
   const router = useRouter();
+  const [transactionData, setTransactionData]: any = useState("");
 
   const [documentHeight, setDocHeigth]: any = useState("auto");
   const [verificationHeight, setVerHeigth]: any = useState(0);
@@ -47,26 +48,15 @@ const Customer = ({ wallet_address }) => {
   const [gender, setGender] = useState("");
   const [isCameraStart, setCameraStart] = useState(false);
   const [toValidate, setValidate] = useState(false);
+  const [resultMRZ, setMRZ] = useState("");
 
-  const thumbs = files.map((file) => (
-    <div className="w-full relative mt-1" key={file.name}>
-      <Image
-        id="first-img"
-        alt="passport"
-        src={file.preview}
-        className="object-cover mx-auto w-full "
-        width={450}
-        height={500}
-        onLoad={() => {
-          URL.revokeObjectURL(file.preview);
-        }}
-      />
-      <canvas
-        id="canvas1"
-        className="absolute w-full h-full z-30 top-0 mt-1 right-0"
-      ></canvas>
-    </div>
-  ));
+  // useEffect(() => {
+  //   // change for testing
+  //   const address_test = "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC";
+  //   let token_tx, normal_tx;
+  //   fetchData(normal_tx, token_tx, address_test);
+  // }, []);
+
   const {
     handleSubmit,
     register,
@@ -80,6 +70,7 @@ const Customer = ({ wallet_address }) => {
       setAuth(true);
     }
   }, [wallet_address, router, address]);
+
   useEffect(() => {
     if (toValidate) {
       setDocHeigth(0);
@@ -186,7 +177,9 @@ const Customer = ({ wallet_address }) => {
                           Drag n drop some files here, or click to select files
                         </p>
                       </div>
-                      <aside>{thumbs}</aside>
+                      <aside>
+                        <Thumbs file={files[0]} setMrz={setMRZ} />
+                      </aside>
                     </section>
                   </div>
                   <div>
@@ -265,7 +258,7 @@ const Customer = ({ wallet_address }) => {
       </Layout>
     </>
   );
-};
+}
 export const getServerSideProps = async ({ params }) => {
   const wallet_address = params.slug;
   // check wallet address

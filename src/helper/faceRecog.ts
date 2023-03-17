@@ -48,14 +48,15 @@ export const loadModels = async () => {
       return faceMatcher.findBestMatch(f.descriptor);
     });
     if (results.findIndex((i: any) => i._label === "Face") !== -1) {
-      let matched = [faces[results.findIndex((i:any) => i._label === "Face")]];
+      let matched:any = [faces[results.findIndex((i:any) => i._label === "Face")]];
     //   matched = faceapi.resizeResults(matched, { height: 300, width: 300 });
     //     faceapi.draw.drawDetections(document.getElementById("canvas2"), matched, {
     //       withScore: false,
     //     });
 
-    console.log(faces)
-
+    console.log("LIVE",faces[0].descriptor)
+    console.log("PASSPORT",labledFace)
+    // console.log("RESULT",)
     faceapi.draw.drawFaceLandmarks(canvas2,matched)
     
       //   this.closeWebcam();

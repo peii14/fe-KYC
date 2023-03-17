@@ -1,5 +1,10 @@
+// import _ from 'lodash'
+import axios from 'axios';
+import { mean,unique } from '@/helper/math'
+import XGBoost from 'ml-xgboost'
+// const XGBoost = dynamic(() => import("ml-xgboost"), { ssr: false });
+// import loadXGBoost from 'ml-xgboost/src/loadXGBoost'
 
-const _ = require('lodash')
 function encode_utf8(s:string) {
     const encoder = new TextEncoder()
     return encoder.encode(s)
@@ -8,7 +13,7 @@ function encode_utf8(s:string) {
 function avgTime(timeDiff: number[]): string {
   let timeDifference = 0;
   if (timeDiff.length > 1) {
-    timeDifference = _.mean(timeDiff);
+    timeDifference = mean(timeDiff);
   }
   return timeDifference.toFixed(2);
 }
@@ -18,7 +23,7 @@ function min_max_avg(value_array_tnxs: number[]): [string, string, string] {
   if (value_array_tnxs.length > 0) {
     minVal = Math.min(...value_array_tnxs);
     maxVal = Math.max(...value_array_tnxs);
-    avgVal = _.mean(value_array_tnxs);
+    avgVal = mean(value_array_tnxs);
   }
   return [minVal.toFixed(6), maxVal.toFixed(6), avgVal.toFixed(6)];
 }
@@ -26,10 +31,10 @@ function min_max_avg(value_array_tnxs: number[]): [string, string, string] {
 function uniq_addresses(sent_addresses: string[], received_addresses: string[]): [number, number] {
   let uniqSent = 0, createdContrcts = 0, uniqRec = 0;
   if (sent_addresses.length > 0) {
-    uniqSent = _.unique(sent_addresses).length;
+    uniqSent = unique(sent_addresses).length;
   }
   if (received_addresses.length > 0) {
-    uniqRec = _.unique(received_addresses).length;
+    uniqRec = unique(received_addresses).length;
   }
   return [uniqSent, uniqRec];
 }
@@ -103,7 +108,7 @@ export function token_transfer_transactions(address: string, data: any) {
                 }
             }
             // if a contract
-            if(data['resuilt'][tokenTnx]['contractAddress'] === address){
+            if(data['result'][tokenTnx]['contractAddress'] === address){
                 tokenContractTnx = tokenContractTnx +1
                 valueReceived.push(Number(data['result'][tokenTnx]['value'])/1000000000000000000)
                 sentToAddresses.push(data['result'][tokenTnx],['to'])
@@ -126,11 +131,11 @@ export function token_transfer_transactions(address: string, data: any) {
         let avgTimeBetweenSentTnx = avgTime(timeDiffSent)
         let avgTimeBetweenRecTnx = avgTime(timeDiffReceive)
         let avgTimeBetweenContractTnx = avgTime(timeDiffContractTnx)
-        let minValReceived, maxValReceived, avgValReceived = min_max_avg(valueReceived)
-        let minValSent, maxValSent, avgValSent = min_max_avg(valueSent)
-        let minValSentContract, maxValSentContract, avgValSentContract = min_max_avg(valueSentContracts)
-        let uniqSentTokenName = (_.unique(tokenSentName)).length()
-        let uniqRecTokenName = (_.unique(tokenReceivedName)).length()
+        let [minValReceived, maxValReceived, avgValReceived] = min_max_avg(valueReceived)
+        let [minValSent, maxValSent, avgValSent] = min_max_avg(valueSent)
+        let [minValSentContract, maxValSentContract, avgValSentContract] = min_max_avg(valueSentContracts)
+        // let uniqSentTokenName = _.uniq(tokenSentName).length()
+        // let uniqRecTokenName = _.uniq(tokenReceivedName).length()
 
         ERC20_contract_tnx_fields = [totalTnx, totalEtherRec, totalEtherSent, totalEtherContract, uniqSentAddr, uniqRecAddr,
             uniqSentContAddr, uniqRecContAddr, avgTimeBetweenSentTnx,
@@ -139,10 +144,11 @@ export function token_transfer_transactions(address: string, data: any) {
             minValSent, maxValSent, avgValSent,
             minValSentContract, maxValSentContract, avgValSentContract,
             ]
+            ERC20_contract_tnx_fields = ERC20_contract_tnx_fields.map((isStr:any)=> Number(isStr))
             return ERC20_contract_tnx_fields
     }
 }
-export function normalTransactions(data:any,address: string){
+export function normalTransactions(address: string,data:any){
         let receivedTransactions = 0;
         let sentTransactions = 0;
         let createdContracts = 0;
@@ -209,7 +215,7 @@ export function normalTransactions(data:any,address: string){
             const [minValSentContract, maxValSentContract, avgValSentContract] = min_max_avg(valueSentContracts)
             const timeDiffBetweenFirstAndLast = timeDiffFirstLast(timestamp)
 
-            const transaction_fields = [avgTimeBetweenSentTnx, avgTimeBetweenRecTnx, timeDiffBetweenFirstAndLast,
+            let transaction_fields = [avgTimeBetweenSentTnx, avgTimeBetweenRecTnx, timeDiffBetweenFirstAndLast,
                 sentTransactions,
                 receivedTransactions, createdContracts,
                 numUniqRecAddress, numUniqSentAddress,
@@ -218,7 +224,67 @@ export function normalTransactions(data:any,address: string){
                 minValSentContract, maxValSentContract, avgValSentContract,
                 totalTnx, totalEtherSent, totalEtherReceived, totalEtherSentContracts,
                 totalEtherBalance]
+                transaction_fields = transaction_fields.map((isStr:any)=> Number(isStr))
             return transaction_fields
         }
     }
-  
+
+const columns = ['Avg_min_between_sent_tnx', 'Avg_min_between_received_tnx',
+'Time_Diff_between_first_and_last_(Mins)', 'Sent_tnx', 'Received_Tnx',
+'Number_of_Created_Contracts', 'Unique_Received_From_Addresses',
+'Unique_Sent_To_Addresses', 'min_value_received', 'max_value_received',
+'avg_val_received', 'min_val_sent', 'max_val_sent', 'avg_val_sent',
+'min_value_sent_to_contract', 'max_val_sent_to_contract',
+'avg_value_sent_to_contract',
+'total_transactions_(including_tnx_to_create_contract)',
+'total_Ether_sent', 'total_ether_received',
+'total_ether_sent_contracts', 'total_ether_balance', 'Total_ERC20_tnxs',
+'ERC20_total_Ether_received', 'ERC20_total_ether_sent',
+'ERC20_total_Ether_sent_contract', 'ERC20_uniq_sent_addr',
+'ERC20_uniq_rec_addr', 'ERC20_uniq_sent_addr.1',
+'ERC20_uniq_rec_contract_addr', 'ERC20_avg_time_between_sent_tnx',
+'ERC20_avg_time_between_rec_tnx', 'ERC20_avg_time_between_rec_2_tnx',
+'ERC20_avg_time_between_contract_tnx', 'ERC20_min_val_rec',
+'ERC20_max_val_rec', 'ERC20_avg_val_rec', 'ERC20_min_val_sent',
+'ERC20_max_val_sent', 'ERC20_avg_val_sent',
+'ERC20_min_val_sent_contract', 'ERC20_max_val_sent_contract',
+'ERC20_avg_val_sent_contract']
+
+export const fetchData = async (normal_tx,token_tx,address_test) => {
+   
+    try {
+      const [tokenTransferTransaction, normalTransaction, JSON_model]: any =
+        await Promise.all([
+          axios.get(
+            `http://api.etherscan.io/api?module=account&action=tokentx&address=${address_test}&startblock=0&endblock=99999999&sort=asc&apikey=G4J9IVBGIUU38JX7NBFIB5VAQX4EMUK7VB`
+          ),
+          axios.get(
+            `https://api.etherscan.io/api?module=account&action=txlist&address=${address_test}&startblock=0&endblock=99999999&page=1&offset=1000&sort=asc&apikey=G4J9IVBGIUU38JX7NBFIB5VAQX4EMUK7VB`
+          ),
+          axios.get(
+            "https://res.cloudinary.com/dmaoo0uy0/raw/upload/v1678395204/transaction_history.json"
+          ),
+        ]);
+      if (tokenTransferTransaction) {
+        token_tx = token_transfer_transactions(
+          address_test,
+          tokenTransferTransaction.data
+        );
+      }
+      if (normalTransaction) {
+        normal_tx = normalTransactions(address_test, normalTransaction.data);
+      }
+      console.log("NORMAL", normal_tx);
+      console.log("TOKEN", token_tx);
+      const transactions = [...normal_tx, ...token_tx];
+      // load model
+      const xgb = new XGBoost()
+      const model = xgb.load(JSON_model)
+      const prediction = model.predict(transactions);
+      console.log(prediction);
+    
+      
+    } catch (e) {
+      console.log(e);
+    }
+}
