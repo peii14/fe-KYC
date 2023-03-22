@@ -21,11 +21,9 @@ const Thumbs = ({ file, setMrz }: ThumbsProps) => {
           height={500}
           onLoad={async (e: any) => {
             URL.revokeObjectURL(file.preview);
-            // preprocessing(e.target, mrzRef);
-            console.log(file);
-            const canvas: any = document.getElementById("preprocessed");
-            const ctx = canvas.getContext("2d");
-            extractMRZ("/img/" + file.path, ctx)
+            // const canvas: any = document.getElementById("preprocessed");
+            // const ctx = canvas.getContext("2d");
+            extractMRZ("/img/" + file.path)
               .then((mrzInfo) => {
                 console.log(mrzInfo);
               })
@@ -44,8 +42,12 @@ const Thumbs = ({ file, setMrz }: ThumbsProps) => {
         height={500}
         className="absolute w-full h-full z-30 top-0 mt-1 right-0"
       ></canvas>
-      <p>Prep</p>
-      <canvas id="preprocessed" className="object-cover w-full " ref={mrzRef} />
+      {/* <p>Prep</p>
+      <canvas
+        id="preprocessed"
+        className="object-cover w-full  overflow-visible "
+        ref={mrzRef}
+      /> */}
     </div>
   );
 };
