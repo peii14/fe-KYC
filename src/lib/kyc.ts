@@ -10,6 +10,7 @@ async function getContract() {
   const connectionProfilePath = path.resolve(process.cwd(), 'src/lib/connection.json');
   const connectionProfile = JSON.parse(fs.readFileSync(connectionProfilePath, 'utf8'));
 
+  // TODO: work on identity
   const connectionOptions = {
     wallet,
     identity: 'BCA', // Replace this with the user identity you have enrolled and added to the wallet

@@ -1,10 +1,8 @@
 import { Gateway, Wallets } from 'fabric-network';
-import { Client, User } from 'fabric-common';
 import FabricCAClient from 'fabric-ca-client';
-import fs from 'fs';
 import path from 'path';
 
-async function enrollUser(orgNumber:string, adminName:string, connection:any) {
+export async function enrollAdmin(orgNumber:string, adminName:string, connection:any) {
     try {
         // load the network configuration
         const ccp = connection
@@ -45,4 +43,7 @@ async function enrollUser(orgNumber:string, adminName:string, connection:any) {
     }
 }
 
-export default enrollUser;
+export async function enrollCustomer(orgNumber:string, adminName:string, connection:any){
+    // TODO: Implement this function
+}
+
