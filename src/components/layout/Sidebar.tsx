@@ -88,7 +88,7 @@ const Sidebar = () => {
           <ul className="py-20 flex flex-col space-y-3">
             <li>
               <Link
-                href={"/" + address + "/"}
+                href={"/admin/"}
                 className={`${
                   route.asPath.split("/").length - 1 === 1
                     ? " bg-dark text-light"
@@ -101,7 +101,7 @@ const Sidebar = () => {
             </li>
             <li>
               <Link
-                href={"/" + address + "/customer-status"}
+                href={"/admin/accepted-request"}
                 className={`${
                   route.asPath.includes("/customer-status")
                     ? " bg-dark text-light"
@@ -114,7 +114,7 @@ const Sidebar = () => {
             </li>
             <li>
               <Link
-                href={"/" + address + "/transaction-history"}
+                href={"/admin/update-customer"}
                 className={`${
                   route.asPath.includes("/transaction-history")
                     ? " bg-dark text-light"

@@ -2,12 +2,12 @@ import Layout from "@/components/layout/Layout";
 import Seo from "@/components/Seo";
 import Card from "@/components/shared/Card";
 import Table from "@/components/shared/Table";
-const Admin = () => {
+const Accepted = () => {
   const header = [
     "Request ID",
-    "Wallet Address",
     "Requested on",
-    "AML",
+    "End of Passport Validity",
+    "AML Score",
     "Action",
   ];
   const values = [{}];
@@ -19,7 +19,7 @@ const Admin = () => {
           <section className="">
             <Card>
               <div className="">
-                <h1>Incoming Request</h1>
+                <h1>Accepted Request</h1>
                 <aside>
                   <Table headers={header} values={values} isEdit={false} />
                 </aside>
@@ -31,4 +31,4 @@ const Admin = () => {
     </>
   );
 };
-export default Admin;
+export default Accepted;
