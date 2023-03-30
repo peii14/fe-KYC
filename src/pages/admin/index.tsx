@@ -4,9 +4,9 @@ import Seo from "@/components/Seo";
 const Admin = () => {
   return (
     <>
-      <Layout>
+      <Layout isAuth={true}>
         <Seo title="Bank Dashboard" />
-        <main></main>
+        <main className="min-w-full mt-24"></main>
       </Layout>
     </>
   );
