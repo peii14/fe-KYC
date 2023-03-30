@@ -16,8 +16,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDropzone } from "react-dropzone";
 import BinaryPicker from "@/components/shared/BinaryPicker";
 import FaceRecognition from "@/components/faceRecognition";
-
+import axios from "axios";
 import Thumbs from "@/components/shared/Thumbs";
+import ListBox from "@/components/shared/Listbox";
+import { toast } from "react-toastify";
 
 function Customer({ wallet_address }) {
   const [files, setFiles] = useState([]);
@@ -49,7 +51,8 @@ function Customer({ wallet_address }) {
   const [isCameraStart, setCameraStart] = useState(false);
   const [toValidate, setValidate] = useState(false);
   const [resultMRZ, setMRZ] = useState("");
-
+  const [financialInstitution, setFinancialInstitution] = useState([]);
+  const [selectedFI, setSelectedFI] = useState({ institution: "BCA" });
   // useEffect(() => {
   //   // change for testing
   //   const address_test = "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC";
@@ -70,6 +73,17 @@ function Customer({ wallet_address }) {
       setAuth(true);
     }
   }, [wallet_address, router, address]);
+  useEffect(() => {
+    const getFinancialInstitution = async () => {
+      const res = await toast.promise(axios.get("/api/financial-institution"), {
+        pending: "Loading Financial...",
+        success: "Success",
+        error: "Error",
+      });
+      setFinancialInstitution(JSON.parse(res.data.data));
+    };
+    getFinancialInstitution();
+  }, []);
 
   useEffect(() => {
     if (toValidate) {
@@ -127,7 +141,6 @@ function Customer({ wallet_address }) {
                     register={register}
                     placeholder={"Indonesia"}
                   />
-                  {/* change to DOB */}
                   <div>
                     <p>Date of birth</p>
                     <div className="px-3 py-2 my-2 w-full border-2 rounded-lg">
@@ -158,6 +171,14 @@ function Customer({ wallet_address }) {
                         onChange={(date) => setPassportDate(date)}
                       />
                     </div>
+                  </div>
+                  <div className="z-50">
+                    <p>Select Financial Institution</p>
+                    <ListBox
+                      list={financialInstitution}
+                      selected={selectedFI}
+                      setSelected={setSelectedFI}
+                    />
                   </div>
                 </div>
               </AnimateHeight>

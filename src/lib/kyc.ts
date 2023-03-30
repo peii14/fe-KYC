@@ -51,3 +51,6 @@ export async function addApprovedFinancialInstitution(financialInstitution:strin
 export async function getApprovedFinancialInstitutions() {
   return executeContractTransaction('getApprovedFinancialInstitutions');
 }
+export async function removeApprovedFinancialInstitution(financialInstitution:string, mspid:String) {
+  return executeContractTransaction('removeApprovedFinancialInstitution', financialInstitution, mspid);
+}
