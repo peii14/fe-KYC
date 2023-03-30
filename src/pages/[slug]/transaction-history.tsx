@@ -30,7 +30,13 @@ const Transaction = ({ wallet_address, transaction_history }) => {
             <Card>
               <h1>Transaction History</h1>
               <div>
-                <Table headers={header} values={values} isEdit={false} />
+                <Table
+                  headers={header}
+                  values={values}
+                  isEdit={false}
+                  subtitle="Your transaction history that are recorded on the Ethereum
+              main-net"
+                />
               </div>
             </Card>
           </section>

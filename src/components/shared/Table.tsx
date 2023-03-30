@@ -3,11 +3,12 @@ import Sort from "../svg/sort";
 interface TableProps {
   readonly headers: any;
   readonly values: any;
+  readonly subtitle: string;
   //   readonly title: string;
   readonly isEdit: boolean;
 }
 
-const Table = ({ headers, values, isEdit }: TableProps) => {
+const Table = ({ headers, values, isEdit, subtitle = "" }: TableProps) => {
   return (
     <>
       <section className="mt-5 mx-auto">
@@ -20,8 +21,7 @@ const Table = ({ headers, values, isEdit }: TableProps) => {
             </div>
 
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-300">
-              Your transaction history that are recorded on the Ethereum
-              main-net
+              {subtitle}
             </p>
           </div>
         </div>

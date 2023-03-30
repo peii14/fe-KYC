@@ -21,7 +21,12 @@ const Admin = () => {
               <div className="">
                 <h1>Incoming Request</h1>
                 <aside>
-                  <Table headers={header} values={values} isEdit={false} />
+                  <Table
+                    headers={header}
+                    values={values}
+                    isEdit={false}
+                    subtitle="Incoming Request to you"
+                  />
                 </aside>
               </div>
             </Card>

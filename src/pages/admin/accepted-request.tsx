@@ -21,7 +21,12 @@ const Accepted = () => {
               <div className="">
                 <h1>Accepted Request</h1>
                 <aside>
-                  <Table headers={header} values={values} isEdit={false} />
+                  <Table
+                    headers={header}
+                    values={values}
+                    isEdit={false}
+                    subtitle="Accepted KYC Request"
+                  />
                 </aside>
               </div>
             </Card>
