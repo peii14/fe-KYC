@@ -14,6 +14,7 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
     }
     else if (req.method === 'DELETE'){
         const fi = await removeApprovedFinancialInstitution(financialInstitution,identity,mspid)
+        res.status(200).json({success:true,data:fi});
     }
     else{
         res.status(405).json({success:false,message:'Method not allowed'});

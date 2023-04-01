@@ -35,21 +35,21 @@ async function executeContractTransaction(transactionName:string,entity:string, 
   }
 }
 // PPRIVATE DATA
-export async function submitKycData(customerId, kycData, entity:string) {
-  return executeContractTransaction('submitKycData',entity, customerId, kycData);
+export async function submitKycData(walletAddress:string, kycData:any, entity:string) {
+  return executeContractTransaction('submitKycData',entity, walletAddress, kycData);
 }
 
-export async function getKycData(customerId:Number, entity:string) {
-  return executeContractTransaction('getKycData',entity, customerId);
+export async function getKycData(walletAddress:string, entity:string) {
+  return executeContractTransaction('getKycData',entity, walletAddress);
 }
 
 // KYC REQEUSTS
-export async function requestValidation(customerId:Number, walletAddress:string, currentStatus:string, email: string,entity:string ) {
-  return executeContractTransaction('requestValidation',entity, customerId);
+export async function requestValidation(walletAddress:string, currentStatus:string,entity:string ) {
+  return executeContractTransaction('requestValidation',entity, walletAddress, currentStatus);
 }
 
-export async function getRequestValidation(customerId:string,entity:string) {
-  return executeContractTransaction('getRequestValidation',entity, customerId);
+export async function getRequestValidation(entity:string, walletAddress:string) {
+  return executeContractTransaction('getRequestValidation',entity,walletAddress );
 }
 
 // USER PROFILE

@@ -17,7 +17,8 @@ import { useDropzone } from "react-dropzone";
 import BinaryPicker from "@/components/shared/BinaryPicker";
 import FaceRecognition from "@/components/faceRecognition";
 import Thumbs from "@/components/shared/Thumbs";
-import ListBox from "@/components/shared/Listbox";
+import ListBox from "@/components/shared/listBox";
+
 import { getApprovedFinancialInstitutions } from "@/lib/kyc";
 
 function Customer({ wallet_address, fi }) {
@@ -161,15 +162,11 @@ function Customer({ wallet_address, fi }) {
                   </div>
                   <div className="z-50">
                     <p>Select Financial Institution</p>
-                    {financialInstitution ? (
-                      <ListBox
-                        list={financialInstitution}
-                        selected={selectedFI}
-                        setSelected={setSelectedFI}
-                      />
-                    ) : (
-                      <></>
-                    )}
+                    <ListBox
+                      list={financialInstitution}
+                      selected={selectedFI}
+                      setSelected={setSelectedFI}
+                    />
                   </div>
                 </div>
               </AnimateHeight>
@@ -273,7 +270,7 @@ function Customer({ wallet_address, fi }) {
 }
 export const getServerSideProps = async ({ params }) => {
   const wallet_address = params.slug;
-  const fi = await getApprovedFinancialInstitutions(wallet_address);
+  const fi = await getApprovedFinancialInstitutions("SUPER-ADMIN");
   return {
     props: { wallet_address, fi },
   };
