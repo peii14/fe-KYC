@@ -273,9 +273,7 @@ function Customer({ wallet_address, fi }) {
 }
 export const getServerSideProps = async ({ params }) => {
   const wallet_address = params.slug;
-  // check wallet address
-  const fi: any = await getApprovedFinancialInstitutions(wallet_address);
-  console.log(fi);
+  const fi = await getApprovedFinancialInstitutions(wallet_address);
   return {
     props: { wallet_address, fi },
   };
