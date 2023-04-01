@@ -30,11 +30,25 @@ async function executeContractTransaction(transactionName, ...args) {
     throw error;
   }
 }
-
+// PPRIVATE DATA
 export async function submitKycData(customerId, kycData) {
   return executeContractTransaction('submitKycData', customerId, kycData);
 }
 
+export async function getKycData(customerId:Number) {
+  return executeContractTransaction('getKycData', customerId);
+}
+// KYC REQEUSTS
+
+export async function requestValidation(customerId:Number, walletAddress:string, currentStatus:string, email: string, ) {
+  return executeContractTransaction('requestValidation', customerId);
+}
+
+export async function getRequestValidation(customerId:string) {
+  return executeContractTransaction('getRequestValidation', customerId);
+}
+
+// USER PROFILE
 export async function createUserProfile(userId:Number, ethereumAddress:String) {
   return executeContractTransaction('createUserProfile', userId, ethereumAddress);
 }
@@ -42,9 +56,7 @@ export async function createUserProfile(userId:Number, ethereumAddress:String) {
 export async function getUserProfile(userId:Number) {
   return executeContractTransaction('getUserProfile', userId);
 }
-export async function getKycData(customerId:Number) {
-  return executeContractTransaction('getKycData', customerId);
-}
+// FINANCIAL INSTITUTIONS
 export async function addApprovedFinancialInstitution(financialInstitution:string, mspid:String) {
   return executeContractTransaction('addApprovedFinancialInstitution', financialInstitution,mspid);
 }
