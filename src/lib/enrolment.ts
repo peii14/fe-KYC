@@ -2,7 +2,7 @@ import { Gateway, Wallets } from 'fabric-network';
 import FabricCAClient from 'fabric-ca-client';
 import path from 'path';
 
-export async function enrollAdmin(orgNumber:string, adminName:string, connection:any) {
+export async function enrollEntity(orgNumber:string, adminName:string, connection:any) {
     try {
         // load the network configuration
         const ccp = connection
@@ -41,9 +41,5 @@ export async function enrollAdmin(orgNumber:string, adminName:string, connection
         console.error(`Failed to enroll admin user "${adminName}": ${error}`);
         process.exit(1);
     }
-}
-
-export async function enrollCustomer(orgNumber:string, adminName:string, connection:any){
-    // TODO: Implement this function
 }
 

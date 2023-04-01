@@ -75,11 +75,16 @@ function Customer({ wallet_address }) {
   }, [wallet_address, router, address]);
   useEffect(() => {
     const getFinancialInstitution = async () => {
-      const res = await toast.promise(axios.get("/api/financial-institution"), {
-        pending: "Loading Financial...",
-        success: "Success",
-        error: "Error",
-      });
+      const res = await toast.promise(
+        axios.get("/api/financial-institution", {
+          params: { identity: "SUPER-ADMIN" },
+        }),
+        {
+          pending: "Loading Financial...",
+          success: "Success",
+          error: "Error",
+        }
+      );
       setFinancialInstitution(JSON.parse(res.data.data));
     };
     getFinancialInstitution();
