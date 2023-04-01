@@ -16,12 +16,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDropzone } from "react-dropzone";
 import BinaryPicker from "@/components/shared/BinaryPicker";
 import FaceRecognition from "@/components/faceRecognition";
-import axios from "axios";
 import Thumbs from "@/components/shared/Thumbs";
 import ListBox from "@/components/shared/Listbox";
-import { toast } from "react-toastify";
+import { getApprovedFinancialInstitutions } from "@/lib/kyc";
 
-function Customer({ wallet_address }) {
+function Customer({ wallet_address, fi }) {
   const [files, setFiles] = useState([]);
 
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
@@ -51,8 +50,10 @@ function Customer({ wallet_address }) {
   const [isCameraStart, setCameraStart] = useState(false);
   const [toValidate, setValidate] = useState(false);
   const [resultMRZ, setMRZ] = useState("");
-  const [financialInstitution, setFinancialInstitution] = useState([]);
-  const [selectedFI, setSelectedFI] = useState({ institution: "BCA" });
+  const [financialInstitution, setFinancialInstitution] = useState(
+    JSON.parse(fi)
+  );
+  const [selectedFI, setSelectedFI] = useState(JSON.parse(fi)[0]);
   // useEffect(() => {
   //   // change for testing
   //   const address_test = "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC";
@@ -73,23 +74,6 @@ function Customer({ wallet_address }) {
       setAuth(true);
     }
   }, [wallet_address, router, address]);
-  useEffect(() => {
-    const getFinancialInstitution = async () => {
-      const res = await toast.promise(
-        axios.get("/api/financial-institution", {
-          params: { identity: "SUPER-ADMIN" },
-        }),
-        {
-          pending: "Loading Financial...",
-          success: "Success",
-          error: "Error",
-        }
-      );
-      setFinancialInstitution(JSON.parse(res.data.data));
-    };
-    getFinancialInstitution();
-  }, []);
-
   useEffect(() => {
     if (toValidate) {
       setDocHeigth(0);
@@ -162,12 +146,10 @@ function Customer({ wallet_address }) {
                     register={register}
                     placeholder={"X9281028"}
                   />
-                  {/* change to male or female only */}
                   <div>
                     <p className="mb-3">Gender</p>
                     <BinaryPicker />
                   </div>
-                  {/* datepicker */}
                   <div>
                     <p>Passport expiry date</p>
                     <div className="px-3 py-2 my-2 w-full border-2 rounded-lg">
@@ -179,11 +161,15 @@ function Customer({ wallet_address }) {
                   </div>
                   <div className="z-50">
                     <p>Select Financial Institution</p>
-                    <ListBox
-                      list={financialInstitution}
-                      selected={selectedFI}
-                      setSelected={setSelectedFI}
-                    />
+                    {financialInstitution ? (
+                      <ListBox
+                        list={financialInstitution}
+                        selected={selectedFI}
+                        setSelected={setSelectedFI}
+                      />
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 </div>
               </AnimateHeight>
@@ -288,8 +274,10 @@ function Customer({ wallet_address }) {
 export const getServerSideProps = async ({ params }) => {
   const wallet_address = params.slug;
   // check wallet address
+  const fi: any = await getApprovedFinancialInstitutions(wallet_address);
+  console.log(fi);
   return {
-    props: { wallet_address },
+    props: { wallet_address, fi },
   };
 };
 export default Customer;

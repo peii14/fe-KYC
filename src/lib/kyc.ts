@@ -42,8 +42,8 @@ export async function submitKycData(customerId, kycData, entity:string) {
 export async function getKycData(customerId:Number, entity:string) {
   return executeContractTransaction('getKycData',entity, customerId);
 }
-// KYC REQEUSTS
 
+// KYC REQEUSTS
 export async function requestValidation(customerId:Number, walletAddress:string, currentStatus:string, email: string,entity:string ) {
   return executeContractTransaction('requestValidation',entity, customerId);
 }
