@@ -1,0 +1,10 @@
+[
+  {
+    "name": "customerPrivateData",
+    "policy": "OR('Org1MSP.member', 'Org2MSP.member')",
+    "requiredPeerCount": 0,
+    "maxPeerCount": 3,
+    "memberOnlyRead": true,
+    "memberOnlyWrite": true
+  }
+]

@@ -34,20 +34,24 @@ async function executeContractTransaction(transactionName:string,entity:string, 
     throw error;
   }
 }
-// PPRIVATE DATA
-export async function submitKycData(walletAddress:string, kycData:any, entity:string) {
-  return executeContractTransaction('submitKycData',entity, walletAddress, kycData);
+// Initiate ledger
+export async function initLedger(entity:string) {
+  return executeContractTransaction('initLedger',entity);
 }
 
-export async function getKycData(walletAddress:string, entity:string) {
-  return executeContractTransaction('getKycData',entity, walletAddress);
+// PPRIVATE DATA
+export async function submitKycData(walletAddress: string, encryptedKycData: any, entity: string) {
+   return executeContractTransaction('submitKycData', entity,walletAddress, JSON.stringify(encryptedKycData));
+
+}
+export async function getKycData(financialInstitution:string, peerMSPID:string, entity:string) {
+  return executeContractTransaction('getKycData',entity,entity, financialInstitution, peerMSPID);
 }
 
 // KYC REQEUSTS
 export async function requestValidation(walletAddress:string, currentStatus:string,entity:string ) {
   return executeContractTransaction('requestValidation',entity, walletAddress, currentStatus);
 }
-
 export async function getRequestValidation(entity:string, walletAddress:string) {
   return executeContractTransaction('getRequestValidation',entity,walletAddress );
 }
@@ -62,7 +66,7 @@ export async function getUserProfile(userId:Number,entity:string) {
 }
 // FINANCIAL INSTITUTIONS
 export async function addApprovedFinancialInstitution(financialInstitution:string, mspid:String,entity:string) {
-  return executeContractTransaction('addApprovedFinancialInstitution', financialInstitution,mspid);
+  return executeContractTransaction('addApprovedFinancialInstitution',entity ,financialInstitution,mspid);
 }
 export async function getApprovedFinancialInstitutions(entity:string) {
   return executeContractTransaction('getApprovedFinancialInstitutions',entity);
@@ -70,3 +74,13 @@ export async function getApprovedFinancialInstitutions(entity:string) {
 export async function removeApprovedFinancialInstitution(financialInstitution:string, mspid:String,entity:string) {
   return executeContractTransaction('removeApprovedFinancialInstitution',entity ,financialInstitution, mspid);
 }
+
+export const collectionConfig = [
+  {
+    "name": "customerPrivateData",
+    "policy": "OR('Org1MSP.member', 'Org2MSP.member')",
+    "requiredPeerCount": 0,
+    "maxPeerCount": 3,
+    "blockToLive": 1000000
+  }
+]

@@ -5,7 +5,7 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
     const {financialInstitution, mspid} = req.body;
     const identity = req.query.identity.toString();
     if(req.method === 'POST'){
-        const fi = await addApprovedFinancialInstitution(financialInstitution,identity, mspid)
+        const fi = await addApprovedFinancialInstitution(financialInstitution, mspid, identity)
         res.status(200).json({success:true,data:fi});
     }
     else if(req.method === 'GET'){

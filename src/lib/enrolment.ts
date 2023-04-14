@@ -1,16 +1,30 @@
-import { Gateway, Wallets, X509Identity } from "fabric-network";
+import { Gateway, Wallets } from "fabric-network";
 import FabricCAClient from "fabric-ca-client";
+import { User } from "fabric-common";
 import path from "path";
 import fs from "fs";
+import { generateECIESKeyPair } from "@/helper/private_data";
+import { Identity } from "fabric-network";
 
-interface AdminIdentity {
-  certificate: string;
-  privateKey: string;
+interface X509Identity extends Identity {
+  credentials: {
+    certificate: string;
+    privateKey: string;
+  };
+  mspId: string;
+  type: "X.509";
+  metadata?: {
+    attrs: {
+      hf: {
+        Role: string;
+        OU: string;
+      };
+    };
+  };
 }
 
 export async function enrollAdmin(orgNumber: string, adminName: string) {
   try {
-    // load the network configuration
     const connectionProfilePath = path.resolve(
       process.cwd(),
       `../hyperledger-fabric/test-network/organizations/peerOrganizations/org${orgNumber}.example.com/connection-org${orgNumber}.json`
@@ -18,10 +32,12 @@ export async function enrollAdmin(orgNumber: string, adminName: string) {
     const connectionProfile = JSON.parse(
       fs.readFileSync(connectionProfilePath, "utf8")
     );
-    const ccp = connectionProfile;
 
     // Create a new CA client for interacting with the CA.
-    const caInfo = ccp.certificateAuthorities[`ca.org${orgNumber}.example.com`];
+    const caInfo =
+      connectionProfile.certificateAuthorities[
+        `ca.org${orgNumber}.example.com`
+      ];
     const caTLSCACerts = caInfo.tlsCACerts.pem;
     const ca = new FabricCAClient(
       caInfo.url,
@@ -33,7 +49,7 @@ export async function enrollAdmin(orgNumber: string, adminName: string) {
     const walletPath = path.join(process.cwd(), "../wallet");
     const wallet = await Wallets.newFileSystemWallet(walletPath);
 
-    // Check to see if we've already enrolled the adminName user.
+    // Check to see if we've already enrolled the admin user.
     const identity = await wallet.get(adminName);
     if (identity) {
       console.log(
@@ -46,15 +62,41 @@ export async function enrollAdmin(orgNumber: string, adminName: string) {
     const enrollment = await ca.enroll({
       enrollmentID: "admin",
       enrollmentSecret: "adminpw",
+      attr_reqs: [
+        { name: "hf.Registrar.Roles", optional: false },
+        { name: "hf.Registrar.Attributes", optional: false },
+      ],
     });
-    const x509Identity = {
+
+    const x509Identity: X509Identity = {
       credentials: {
         certificate: enrollment.certificate,
         privateKey: enrollment.key.toBytes(),
       },
       mspId: `Org${orgNumber}MSP`,
       type: "X.509",
+      metadata: {
+        // Use an object literal to define the attribute values.
+        attrs: {
+          hf: {
+            Role: "admin",
+            OU: "ADMIN",
+          },
+        },
+      },
     };
+
+    // Create encryption key pair.
+    const ECIES = await generateECIESKeyPair();
+    const cert_path = "../certs/" + adminName + ".json";
+    fs.writeFile(cert_path, JSON.stringify(ECIES), (err) => {
+      if (err) {
+        console.error(err);
+        throw err;
+      } else {
+        console.log(`Created ECIES key pair for ${adminName}`);
+      }
+    });
 
     await wallet.put(adminName, x509Identity);
     console.log(
@@ -68,7 +110,7 @@ export async function enrollAdmin(orgNumber: string, adminName: string) {
 export async function enrollCustomer(
   orgNumber: number,
   customerId: string,
-  adminIdentity: AdminIdentity,
+  adminIdentity: string,
   customerSecret?: string
 ) {
   try {
@@ -92,35 +134,26 @@ export async function enrollCustomer(
     );
 
     const wallet = await Wallets.newFileSystemWallet("../wallet");
-    const adminIdentityImport: X509Identity = {
-      credentials: {
-        certificate: adminIdentity.certificate,
-        privateKey: adminIdentity.privateKey,
-      },
-      mspId: `Org${orgNumber}MSP`,
-      type: "X.509",
-    };
-    await wallet.put("admin", adminIdentityImport);
 
     const gateway = new Gateway();
     await gateway.connect(connectionProfile, {
       wallet,
-      identity: "admin",
+      identity: adminIdentity,
       discovery: { enabled: false },
     });
 
     // Enroll the customer
     const secret = customerSecret || "customerpw";
     const enrollment = await caClient.enroll({
-      enrollmentID: customerId,
-      enrollmentSecret: secret,
+      enrollmentID: "admin",
+      enrollmentSecret: "adminpw",
     });
     const customerIdentity: X509Identity = {
       credentials: {
         certificate: enrollment.certificate,
         privateKey: enrollment.key.toBytes(),
       },
-      mspId: "Org1MSP",
+      mspId: `Org${orgNumber}MSP`,
       type: "X.509",
     };
 

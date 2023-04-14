@@ -1,4 +1,4 @@
-import { enrollCustomer } from "@/lib/enrolment";
+import { enrollCustomer} from "@/lib/enrolment";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -14,7 +14,7 @@ export default async function handler(
       customerSecret
     );
     res.status(200).json({ success: true, data: enrolled });
-  } else {
+  }  else {
     res.status(405).json({ success: false, message: "Method not allowed" });
   }
 }
