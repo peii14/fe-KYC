@@ -49,11 +49,14 @@ export async function getKycData(financialInstitution:string, peerMSPID:string, 
 }
 
 // KYC REQEUSTS
-export async function requestValidation(walletAddress:string, currentStatus:string,entity:string ) {
-  return executeContractTransaction('requestValidation',entity, walletAddress, currentStatus);
+export async function requestValidation(designated_bank:string,entity:string ) {
+  return executeContractTransaction('requestValidation',entity,designated_bank);
 }
-export async function getRequestValidation(entity:string, walletAddress:string) {
-  return executeContractTransaction('getRequestValidation',entity,walletAddress );
+export async function getRequestValidation(walletAddress:string, designated_bank:string, entity:string) {
+  return executeContractTransaction('getRequestValidation',entity, walletAddress, designated_bank );
+}
+export async function getRequstByDesignatedBank(entity:string) {
+  return executeContractTransaction('getRequestsByDesignatedBank',entity, entity);
 }
 
 // USER PROFILE
