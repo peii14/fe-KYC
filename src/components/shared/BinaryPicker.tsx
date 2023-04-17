@@ -1,25 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 
 interface BinaryPicker {}
 
-const plans = [
-  {
-    gender: "Male",
-  },
-  {
-    gender: "Female",
-  },
-  ,
-];
-
-export default function BinaryPicker() {
-  const [selected, setSelected] = useState(plans[0]);
-
+export default function BinaryPicker({
+  plans,
+  selected,
+  setSelected,
+}: {
+  plans: any;
+  selected: any;
+  setSelected: any;
+}) {
   return (
     <div className="w-full">
       <div className="mx-auto w-full max-w-md">
-        <RadioGroup value={selected} onChange={setSelected}>
+        <RadioGroup
+          value={
+            plans[plans.findIndex((obj) => obj.gender === selected.gender)]
+          }
+          onChange={setSelected}
+        >
           <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
           <div className="h-14  flex w-full justify-around">
             {plans.map((plan) => (

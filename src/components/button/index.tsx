@@ -3,15 +3,18 @@ const Button = ({
   type,
   onClick,
   className,
+  name,
 }: {
   children: React.ReactNode;
   type: number;
   onClick?: any;
   className?: string;
+  name?: string;
 }) => {
   return (
     <>
       <button
+        name={name}
         onClick={onClick}
         className={`w-full  border-2 border-dark duration-200 ${className} ${
           type === 1
