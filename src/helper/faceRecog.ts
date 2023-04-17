@@ -54,8 +54,8 @@ export const loadModels = async () => {
     //       withScore: false,
     //     });
 
-    console.log("LIVE",faces[0].descriptor)
-    console.log("PASSPORT",labledFace)
+    // console.log("LIVE",faces[0].descriptor)
+    // console.log("PASSPORT",labledFace)
     // console.log("RESULT",)
     faceapi.draw.drawFaceLandmarks(canvas2,matched)
     

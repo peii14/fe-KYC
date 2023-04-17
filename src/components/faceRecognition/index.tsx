@@ -17,6 +17,7 @@ const FaceRecognition = ({ passport }: FaceRecognitionProps) => {
   const [matchFound, setMatch] = useState(false);
   const [face1, setFace1] = useState(null);
   const [handle, setHandler] = useState(false);
+  const [matchDuration, setMatchDuration] = useState(0);
   const frame = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     return imageSrc;
@@ -38,10 +39,25 @@ const FaceRecognition = ({ passport }: FaceRecognitionProps) => {
         setHandler,
         handle,
       });
+
+      if (matchFound) {
+        setMatchDuration((prevDuration) => prevDuration + 33);
+        if (matchDuration >= 2000) {
+          clearInterval(interval);
+          console.log("match found");
+          if (webcamRef.current && webcamRef.current.stream) {
+            webcamRef.current.stream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+        }
+      } else {
+        setMatchDuration(0);
+      }
     }, 33); // approximately 30 fps
 
     return () => clearInterval(interval);
-  }, [face1, handle]);
+  }, [face1, handle, matchFound, matchDuration]);
   return (
     <>
       <div
