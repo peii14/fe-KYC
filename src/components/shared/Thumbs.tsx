@@ -23,7 +23,7 @@ const Thumbs = ({ file, setMrz }: ThumbsProps) => {
             URL.revokeObjectURL(file.preview);
             // const canvas: any = document.getElementById("preprocessed");
             // const ctx = canvas.getContext("2d");
-            extractMRZ("/img/" + file.path)
+            extractMRZ("/img/" + file.path, setMrz)
               .then((mrzInfo) => {
                 console.log(mrzInfo);
               })

@@ -1,8 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Webcam from "react-webcam";
 import { findMatch, checkMatch } from "@/helper/faceRecog";
 interface FaceRecognitionProps {
   passport: any;
+  setBiometrics: Dispatch<SetStateAction<any>>;
 }
 
 const videoConstraints = {
@@ -10,7 +18,7 @@ const videoConstraints = {
   height: 720,
   facingMode: "user",
 };
-const FaceRecognition = ({ passport }: FaceRecognitionProps) => {
+const FaceRecognition = ({ passport, setBiometrics }: FaceRecognitionProps) => {
   const [counter, setCounter] = useState(0);
   const webcamRef = useRef(null);
   const [faceFound, setFaceFound] = useState(false);
@@ -38,6 +46,7 @@ const FaceRecognition = ({ passport }: FaceRecognitionProps) => {
         setMatch,
         setHandler,
         handle,
+        setBiometrics,
       });
 
       if (matchFound) {

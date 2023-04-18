@@ -53,6 +53,7 @@ function Customer({ wallet_address, fi }) {
   const [toValidate, setValidate] = useState(false);
   const [resultMRZ, setMRZ] = useState("");
   const [submissions, setSubmissions] = useState(false);
+  const [bioMetrics, setBioMetrics] = useState([]);
   const [financialInstitution, setFinancialInstitution] = useState(
     JSON.parse(fi)
   );
@@ -100,7 +101,10 @@ function Customer({ wallet_address, fi }) {
                 birthDate,
                 passportDate,
                 gender.gender,
-                selectedFI
+                selectedFI,
+                bioMetrics,
+                resultMRZ,
+                wallet_address
               )
             )}
           >
@@ -220,7 +224,10 @@ function Customer({ wallet_address, fi }) {
                       >
                         {isCameraStart ? (
                           <>
-                            <FaceRecognition passport={files[0].preview} />
+                            <FaceRecognition
+                              passport={files[0].preview}
+                              setBiometrics={setBioMetrics}
+                            />
                           </>
                         ) : (
                           <>
