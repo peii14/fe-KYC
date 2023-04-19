@@ -58,6 +58,15 @@ export async function getRequestValidation(walletAddress:string, entity:string) 
 export async function getRequstByDesignatedBank(entity:string) {
   return executeContractTransaction('getRequestsByDesignatedBank',entity, entity);
 }
+export async function editRequestValidation(designated_bank:string,timestamp:string,illicit:string,customer_entity:string) {
+  return executeContractTransaction('editRequestValidation',customer_entity,customer_entity,illicit,designated_bank,timestamp);
+}
+export async function getAcceptedRequestsByBank(entity:string,peerMSPID:string) {
+  return executeContractTransaction('getAcceptedRequestsByBank',entity, entity,peerMSPID);
+}
+export async function acceptRequestValidation(designated_bank:string,timestamp:string,customer_entity:string) {
+  return executeContractTransaction('acceptRequestValidation',customer_entity,customer_entity,designated_bank,timestamp);
+}
 
 // USER PROFILE
 export async function createUserProfile(userId:Number, ethereumAddress:String,entity:string) {

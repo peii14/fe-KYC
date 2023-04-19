@@ -1,14 +1,21 @@
 import Sort from "../svg/sort";
-
+import Button from "../button";
 interface TableProps {
   readonly headers: any;
   readonly values: any;
   readonly subtitle: string;
   //   readonly title: string;
   readonly isEdit: boolean;
+  Edit?: any;
 }
 
-const Table = ({ headers, values, isEdit, subtitle = "" }: TableProps) => {
+const Table = ({
+  headers,
+  values,
+  isEdit,
+  subtitle = "",
+  Edit,
+}: TableProps) => {
   return (
     <>
       <section className="mt-5 mx-auto">
@@ -47,13 +54,13 @@ const Table = ({ headers, values, isEdit, subtitle = "" }: TableProps) => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 className="w-5 h-5 mx-3 text-gray-400 dark:text-gray-600"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
                 />
               </svg>
@@ -80,45 +87,44 @@ const Table = ({ headers, values, isEdit, subtitle = "" }: TableProps) => {
                           scope="col"
                           className="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
                         >
-                          <button className="flex items-center gap-x-3 focus:outline-none">
+                          <button className="flex items-center gap-x-3 capitalize focus:outline-none">
                             <span>{head}</span>
                             {idx >= 1 ? <></> : <Sort />}
                           </button>
                         </th>
                       ))}
-                      {isEdit ? (
+                      {/* {isEdit ? (
                         <th scope="col" className="relative py-3.5 px-4">
                           <span className="sr-only text-dark">Edit</span>
                         </th>
                       ) : (
                         <></>
-                      )}
+                      )} */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                     {values.map((value, idx) => (
-                      <>
-                        <tr key={idx}>
-                          {Object.values(value).map((item: any, id) => {
-                            if (id < headers.length) {
-                              return (
-                                <>
-                                  <td
-                                    key={id}
-                                    className="px-4 py-4 text-sm font-medium whitespace-nowrap"
-                                  >
-                                    <div>
-                                      <p className="font-medium text-gray-800 dark:text-white ">
-                                        {item}
-                                      </p>
-                                    </div>
-                                  </td>
-                                </>
-                              );
-                            }
-                          })}
-                        </tr>
-                      </>
+                      <tr key={idx}>
+                        {Object.values(value).map((item: any, id) => {
+                          if (id < headers.length) {
+                            return (
+                              <>
+                                <td
+                                  key={id}
+                                  className="px-2.5 py-4 text-sm font-medium whitespace-nowrap"
+                                >
+                                  <div>
+                                    <p className="font-medium text-gray-800 dark:text-white ">
+                                      {item}
+                                    </p>
+                                  </div>
+                                </td>
+                              </>
+                            );
+                          }
+                        })}
+                        {isEdit ? <Edit /> : <></>}
+                      </tr>
                     ))}
                   </tbody>
                 </table>
@@ -143,13 +149,13 @@ const Table = ({ headers, values, isEdit, subtitle = "" }: TableProps) => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 className="w-5 h-5 rtl:-scale-x-100"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"
                 />
               </svg>
@@ -167,13 +173,13 @@ const Table = ({ headers, values, isEdit, subtitle = "" }: TableProps) => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 className="w-5 h-5 rtl:-scale-x-100"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
                 />
               </svg>
