@@ -2,7 +2,12 @@ import Layout from "@/components/layout/Layout";
 import Seo from "@/components/Seo";
 import Card from "@/components/shared/Card";
 import Table from "@/components/shared/Table";
-import { getKYC, postIllicitScore, rejectKYC } from "@/helper/assesment-kyc";
+import {
+  getKYC,
+  getPrivateData,
+  postIllicitScore,
+  rejectKYC,
+} from "@/helper/assesment-kyc";
 import { useEffect, useState } from "react";
 import { getApprovedFinancialInstitutions } from "@/lib/kyc";
 import { aprooveKYC } from "@/helper/assesment-kyc";
@@ -12,6 +17,7 @@ const Admin = ({ fi }) => {
   const [financialInstitution, setFinancialInstitution] = useState(
     JSON.parse(fi)
   );
+  const [privateData, setPrivateData] = useState([]);
   const [selectedFI, setSelectedFI] = useState(0);
   const Edit = (props: any) => {
     return (
@@ -33,7 +39,18 @@ const Admin = ({ fi }) => {
           >
             <p className="text-white">Reject</p>
           </button>
-          <button className="col-span-2 bg-red-500 hover:bg-red-800 duration-200 rounded-full px-5 py-1 w-max">
+          {/* TODO:Display private data */}
+          <button
+            onClick={() =>
+              getPrivateData(
+                props.props.walletAddress,
+                props.props.designatedBank,
+                financialInstitution[selectedFI]["mspid"],
+                setPrivateData
+              )
+            }
+            className="col-span-2 bg-red-500 hover:bg-red-800 duration-200 rounded-full px-5 py-1 w-max"
+          >
             <p className="text-white">View Private Data</p>
           </button>
           <button
@@ -61,7 +78,6 @@ const Admin = ({ fi }) => {
         index = i;
       }
     });
-    console.log(values);
     setSelectedFI(index);
   }, [financialInstitution]);
   return (

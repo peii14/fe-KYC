@@ -18,12 +18,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { customer_entity, designated_bank, peerMSPID, kycData } = req.body;
   if (req.method === "GET") {
+    const { customer_entity, designated_bank, peerMSPID } = req.query;
     const private_data = await getKycData(
-      designated_bank,
-      peerMSPID,
-      customer_entity
+      designated_bank.toString(),
+      peerMSPID.toString(),
+      customer_entity.toString()
     );
     const filePath = "../certs/" + designated_bank + ".json";
     const privateKey = await getPrivateECIES(filePath);
@@ -34,6 +34,7 @@ export default async function handler(
     );
     res.status(200).json({ success: true, data: decryptedData });
   } else if (req.method === "POST") {
+    const { customer_entity, designated_bank, peerMSPID, kycData } = req.body;
     // Read the file asynchronously
     const filePath = "../certs/" + designated_bank + ".json";
 
@@ -48,7 +49,7 @@ export default async function handler(
     await submitKycData(customer_entity, encryptedData, customer_entity);
     res.status(200).json({ success: true, data: encryptedData });
   } else if (req.method === "HEAD") {
-    await initLedger(designated_bank);
+    // await initLedger(designated_bank);
     res.status(200).json({ success: true, message: "Chaincode instantiated" });
   } else {
     res.status(405).json({ success: false, message: "Method not allowed" });

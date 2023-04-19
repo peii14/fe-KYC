@@ -40,16 +40,15 @@ export const submitKYC = async (
     const [privateData, kycValidation] = await Promise.all([
       axios.post("/api/private-data", {
         customer_entity: walletAddress,
-        designated_bank: "BCA",
-        peerMSPID: "Org1MSP",
-        kycData: {
-          privateData: "PRIVATE DATA NIH",
-        },
+        designated_bank: selectedFinancialInstitution.institution,
+        peerMSPID: selectedFinancialInstitution.mspid,
+        kycData: submission,
       }),
       axios.post("/api/kyc-validation?mode=customer", {
         customer_entity: walletAddress,
-        designated_bank: "BCA",
+        designated_bank: selectedFinancialInstitution.institution,
       }),
     ]);
+    return [privateData, kycValidation];
   }
 };

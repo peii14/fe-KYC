@@ -6,7 +6,6 @@ import {
   getAllKeys,
   splitCamelCaseStrings,
 } from "./getAllKeys";
-// TODO: Get kyc assesment of each bank
 export const getKYC = async (
   designated_bank: string,
   setValues: Dispatch<SetStateAction<any>>,
@@ -28,7 +27,6 @@ export const getKYC = async (
     )
   );
 };
-// TODO: GET accepted Request
 export const getAcceptedRequest = async (
   designated_bank: string,
   peerMSPID: string,
@@ -54,7 +52,6 @@ export const getAcceptedRequest = async (
     )
   );
 };
-// TODO: GET kyc status of each customer
 export const getKYCStatus = async (wallet_address: string) => {
   const getRequest = await axios.get("/api/kyc-validation?mode=customer", {
     params: { customer_entity: wallet_address },
@@ -62,7 +59,6 @@ export const getKYCStatus = async (wallet_address: string) => {
   const request = JSON.parse(getRequest.data.data);
   return request;
 };
-// TODO: POST kyc agreement
 export const aprooveKYC = async (
   designated_bank: string,
   customer_address: string
@@ -76,7 +72,6 @@ export const aprooveKYC = async (
   const request = JSON.parse(postRequest.data.data);
   return request;
 };
-// TODO: POST kyc rejecton
 export const rejectKYC = async (
   designated_bank: string,
   customer_address: string
@@ -92,7 +87,6 @@ export const rejectKYC = async (
 };
 // TODO: PUT kyc revokation
 export const revokeKYC = async () => {};
-// TODO: POST Illicit score
 export const postIllicitScore = async (
   designated_bank: string,
   customer_address: string,
@@ -109,4 +103,22 @@ export const postIllicitScore = async (
     illicit: illicit.data.prediction === 1 ? "Illicit" : "Legitimate",
   });
   return update;
+};
+
+export const getPrivateData = async (
+  customer_address: string,
+  bank_entity: string,
+  peerMSPID: string,
+  setPrivateData: Dispatch<SetStateAction<any>>
+) => {
+  const getRequest = await axios.get("api/private-data", {
+    params: {
+      customer_entity: customer_address,
+      designated_bank: bank_entity,
+      peerMSPID: peerMSPID,
+    },
+  });
+  const request = JSON.parse(getRequest.data.data);
+  setPrivateData(request);
+  return request;
 };
