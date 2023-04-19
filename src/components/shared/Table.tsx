@@ -108,22 +108,20 @@ const Table = ({
                         {Object.values(value).map((item: any, id) => {
                           if (id < headers.length) {
                             return (
-                              <>
-                                <td
-                                  key={id}
-                                  className="px-2.5 py-4 text-sm font-medium whitespace-nowrap"
-                                >
-                                  <div>
-                                    <p className="font-medium text-gray-800 dark:text-white ">
-                                      {item}
-                                    </p>
-                                  </div>
-                                </td>
-                              </>
+                              <td
+                                key={id}
+                                className="px-2.5 py-4 text-sm font-medium whitespace-nowrap"
+                              >
+                                <div>
+                                  <p className="font-medium text-gray-800 dark:text-white ">
+                                    {item}
+                                  </p>
+                                </div>
+                              </td>
                             );
                           }
                         })}
-                        {isEdit ? <Edit /> : <></>}
+                        {isEdit ? <Edit props={value} /> : <></>}
                       </tr>
                     ))}
                   </tbody>

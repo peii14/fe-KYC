@@ -26,14 +26,18 @@ export const extractWalletAddressAndRequest = (
   return data.map((walletObj) => ({
     walletAddress: walletObj.walletAddress,
     ...walletObj.request,
-    AMLFlag: false.toString(),
   }));
 };
 export const splitCamelCaseStrings = (input: string[]): string[] => {
   const camelCaseSplitter = (str: string): string => {
-    return str.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+    return str.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   };
 
   return input.map(camelCaseSplitter);
 };
-
+export const extractValues = (data: WalletObject[]): RequestObject[] => {
+  return data.map((walletObj) => ({
+    walletAddress: walletObj.walletAddress,
+    ...walletObj.request,
+  }));
+};
