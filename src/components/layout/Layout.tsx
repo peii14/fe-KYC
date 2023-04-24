@@ -36,7 +36,7 @@ const Layout = ({
       >
         <Sidebar />
         <div
-          className={`${poppins.className} col-span-5 ${isAuth ? "pr-24" : ""}`}
+          className={`${poppins.className} col-span-5 ${isAuth ? "pr-16" : ""}`}
         >
           {children}
         </div>
