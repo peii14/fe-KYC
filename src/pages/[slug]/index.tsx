@@ -58,12 +58,6 @@ function Customer({ wallet_address, fi }) {
     JSON.parse(fi)
   );
   const [selectedFI, setSelectedFI] = useState(JSON.parse(fi)[0]);
-  // useEffect(() => {
-  //   // change for testing
-  //   const address_test = "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC";
-  //   let token_tx, normal_tx;
-  //   fetchData(normal_tx, token_tx, address_test);
-  // }, []);
 
   const {
     handleSubmit,

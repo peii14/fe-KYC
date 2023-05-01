@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { getApprovedFinancialInstitutions } from "@/lib/kyc";
 
-const Accepted = ({ fi }) => {
+const Accepted = ({ bank_entity, fi }) => {
   const [header, setHeader] = useState([]);
   const [values, setValues] = useState([]);
   const [financialInstitution, setFinancialInstitution] = useState(
@@ -20,7 +20,7 @@ const Accepted = ({ fi }) => {
     // TODO: ADMIN AUTH replace 0
     let index = -1;
     financialInstitution.forEach((d, i) => {
-      if (d.institution === "BCA") {
+      if (d.institution === bank_entity) {
         index = i;
       }
     });
@@ -30,7 +30,7 @@ const Accepted = ({ fi }) => {
       setValues,
       setHeader
     );
-  }, [financialInstitution]);
+  }, [bank_entity, financialInstitution]);
   const Edit = (props: any) => {
     return (
       <tr className="w-max ">
@@ -93,9 +93,10 @@ const Accepted = ({ fi }) => {
   );
 };
 export const getServerSideProps = async ({ params }) => {
+  const bank_entity = params.slug;
   const fi = await getApprovedFinancialInstitutions("SUPER-ADMIN");
   return {
-    props: { fi },
+    props: { bank_entity, fi },
   };
 };
 export default Accepted;

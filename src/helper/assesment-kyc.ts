@@ -111,7 +111,7 @@ export const getPrivateData = async (
   peerMSPID: string,
   setPrivateData: Dispatch<SetStateAction<any>>
 ) => {
-  const getRequest = await axios.get("api/private-data", {
+  const getRequest = await axios.get("/api/private-data", {
     params: {
       customer_entity: customer_address,
       designated_bank: bank_entity,

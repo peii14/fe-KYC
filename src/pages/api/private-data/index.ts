@@ -5,7 +5,6 @@ import {
   initLedger,
   submitKycData,
 } from "@/lib/kyc";
-import { instantiateChaincode } from "@/lib/instantiate";
 import {
   decryptData,
   encryptDataForMultipleRecipients,

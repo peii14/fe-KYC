@@ -2,7 +2,6 @@ import Layout from "@/components/layout/Layout";
 import Seo from "@/components/Seo";
 import Card from "@/components/shared/Card";
 import Table from "@/components/shared/Table";
-import { IoMdMore } from "react-icons/io";
 import {
   getKYC,
   getPrivateData,
@@ -12,13 +11,12 @@ import {
 import { useEffect, useState } from "react";
 import { getApprovedFinancialInstitutions } from "@/lib/kyc";
 import { aprooveKYC } from "@/helper/assesment-kyc";
-import ModalPrivateData from "@/components/shared/modalPrivateData";
-import { PrivateDataProps } from "@/types/privateData";
-import Button from "@/components/button";
+import { IoMdMore } from "react-icons/io";
 import Dropdown from "@/components/shared/Dropdown";
 import { toast } from "react-toastify";
-
-const Admin = ({ fi }) => {
+import ModalPrivateData from "@/components/shared/modalPrivateData";
+import { PrivateDataProps } from "@/types/privateData";
+const Admin = ({ bank_entity, fi }) => {
   const [header, setHeader] = useState([]);
   const [values, setValues] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -69,7 +67,7 @@ const Admin = ({ fi }) => {
       },
     ];
     return (
-      <tr className="w-max ">
+      <tr className="w-max">
         <td className="relative py-5 text-sm flex justify-between px-2 gap-3 items-center ">
           <button
             onClick={() =>
@@ -90,46 +88,27 @@ const Admin = ({ fi }) => {
           <Dropdown options={options}>
             <IoMdMore />
           </Dropdown>
-          {/* <Button type={3}></Button> */}
-          {/* TODO:Display private data */}
-          {/* <ModalPrivateData
-            button="View Private Data"
-            data={privateData}
-            designatedBank={props.props.designatedBank}
-            walletAddress={props.props.walletAddress}
-            isOpen={isOpen}
-            peerMSPID={financialInstitution[selectedFI]["mspid"]}
-            setIsOpen={setIsOpen}
-            setPrivateData={setPrivateData}
-            title="Private Data"
-          />
-          <button
-            onClick={() =>
-              postIllicitScore(
-                props.props.designatedBank,
-                props.props.walletAddress,
-                financialInstitution[selectedFI]["mspid"]
-              )
-            }
-            className="bg-red-500 hover:bg-red-800 duration-200 rounded-full px-5 py-1 w-max"
-          >
-            <p className="text-white">Refresh AML Status</p>
-          </button> */}
         </td>
       </tr>
     );
   };
   useEffect(() => {
-    // TODO: admin auth
-    getKYC("BCA", setValues, setHeader);
+    const getkyc = async () => {
+      await toast.promise(getKYC(bank_entity, setValues, setHeader), {
+        pending: "Loading...",
+        success: "Success!",
+        error: "Error when fetching KYC",
+      });
+    };
+    getkyc();
     let index = -1;
     financialInstitution.forEach((d, i) => {
-      if (d.institution === "BCA") {
+      if (d.institution === bank_entity) {
         index = i;
       }
     });
     setSelectedFI(index);
-  }, [financialInstitution]);
+  }, [bank_entity, financialInstitution]);
   return (
     <>
       <Layout isAuth={true}>
@@ -168,9 +147,10 @@ const Admin = ({ fi }) => {
 };
 
 export const getServerSideProps = async ({ params }) => {
+  const bank_entity = params.slug;
   const fi = await getApprovedFinancialInstitutions("SUPER-ADMIN");
   return {
-    props: { fi },
+    props: { bank_entity, fi },
   };
 };
 

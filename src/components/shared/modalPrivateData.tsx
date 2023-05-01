@@ -1,8 +1,6 @@
 import { Dispatch, SetStateAction, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PrivateDataProps } from "@/types/privateData";
-import { getPrivateData } from "@/helper/assesment-kyc";
-import { toast } from "react-toastify";
 const dd = {
   name: "Adam",
   nationality: "Indonesia",
