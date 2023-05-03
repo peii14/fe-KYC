@@ -8,6 +8,7 @@ import {
 } from "react";
 import Webcam from "react-webcam";
 import { findMatch, checkMatch } from "@/helper/faceRecog";
+import { toast } from "react-toastify";
 interface FaceRecognitionProps {
   passport: any;
   setBiometrics: Dispatch<SetStateAction<any>>;
@@ -66,7 +67,7 @@ const FaceRecognition = ({ passport, setBiometrics }: FaceRecognitionProps) => {
     }, 33); // approximately 30 fps
 
     return () => clearInterval(interval);
-  }, [face1, handle, matchFound, matchDuration]);
+  }, [face1, handle, matchFound, matchDuration, setBiometrics]);
   return (
     <>
       <div

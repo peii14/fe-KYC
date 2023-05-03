@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { extractMRZ } from "@/helper/tesseract";
-import { useState, useRef, Dispatch, SetStateAction, useEffect } from "react";
+import { useState, useRef, Dispatch, SetStateAction } from "react";
+import { toast } from "react-toastify";
+
 interface ThumbsProps {
   file: any;
   setMrz: Dispatch<SetStateAction<string>>;
@@ -23,13 +25,20 @@ const Thumbs = ({ file, setMrz }: ThumbsProps) => {
             URL.revokeObjectURL(file.preview);
             // const canvas: any = document.getElementById("preprocessed");
             // const ctx = canvas.getContext("2d");
-            extractMRZ("/img/" + file.path, setMrz)
-              .then((mrzInfo) => {
-                console.log(mrzInfo);
-              })
-              .catch((error) => {
-                console.error(error);
-              });
+            await toast.promise(
+              extractMRZ("/img/" + file.path, setMrz)
+                .then((mrzInfo) => {
+                  console.log(mrzInfo);
+                })
+                .catch((error) => {
+                  console.error(error);
+                }),
+              {
+                pending: "Processing OCR...",
+                success: "MRZ Extracted",
+                error: "OCR Error",
+              }
+            );
             setProcess(!process);
           }}
         />

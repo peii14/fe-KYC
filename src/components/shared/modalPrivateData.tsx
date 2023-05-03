@@ -222,7 +222,6 @@ const ModalPrivateData = ({
   function closeModal() {
     setIsOpen(false);
   }
-
   return (
     <>
       {data && (
@@ -260,21 +259,20 @@ const ModalPrivateData = ({
                     </Dialog.Title>
                     <div className="mt-2 grid grid-cols-2 odd:text-gray-500">
                       <p className="">Name</p>
-                      <p>{data.name}</p>
+                      <p>{data.mrz.nameMatch}</p>
                       <p>Nationality</p>
-                      <p>{data.nationality}</p>
+                      <p>{data.mrz.nationalityMatch}</p>
                       <p>Passport ID</p>
-                      <p>{data.passportId}</p>
+                      <p>{data.mrz.documentNumberMatch}</p>
                       <p>Birth Date</p>
-                      <p>{data.birthDate}</p>
+                      <p>{data.mrz.dateOfBirthMatch}</p>
                       <p>Expiry Date</p>
-                      <p>{data.expiryDate}</p>
+                      <p>{data.mrz.expirationDateMatch}</p>
                       <p>Gender</p>
-                      <p>{data.gender}</p>
+                      <p>{data.mrz.genderMatch}</p>
                       <p>Financial Institution</p>
                       <p>{data.selectedFinancialInstitution.institution}</p>
                     </div>
-
                     <div className="mt-4">
                       <button
                         type="button"

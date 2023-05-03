@@ -1,6 +1,6 @@
 import { createWorker } from "tesseract.js";
 import Jimp from "jimp-compact";
-
+import { toast } from "react-toastify";
 interface PassportData {
   documentType: string;
   documentSubType: string | null;

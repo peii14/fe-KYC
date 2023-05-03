@@ -20,7 +20,7 @@ const Dropdown = ({ options, children }: DropdownProps) => {
       <div
         className={`${
           isOpen
-            ? "block absolute shadow-lg border border-primary-200 right-3 -bottom-9 z-30 overflow-hidden"
+            ? "block absolute shadow-lg border border-primary-200 right-3 -bottom-9 z-30 overflow-visible "
             : "hidden"
         }  bg-white w-2/3 absolute rounded-xl`}
       >
@@ -28,7 +28,7 @@ const Dropdown = ({ options, children }: DropdownProps) => {
           options.map((option, idx) => (
             <button
               onClick={option.onClick}
-              className="w-full hover:bg-primary-200 text-left px-3 py-1"
+              className="w-full hover:bg-primary-200 text-left px-3 py-1 z-30"
               key={idx}
             >
               {option.optionName}
