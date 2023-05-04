@@ -20,7 +20,7 @@ type MRZCroppingProps = {
 };
 type OnCroppedCallback = (canvas: HTMLCanvasElement) => void;
 
-export const loadImage = (
+export const loadImage = async (
   event: React.SyntheticEvent<HTMLImageElement, Event>,
   canvasRef: React.RefObject<HTMLCanvasElement>,
   croppedCanvasRef: React.RefObject<HTMLCanvasElement>
@@ -37,16 +37,14 @@ export const loadImage = (
   };
 };
 
-const rotateImage = (src: cv.Mat, angle: number) => {
+const rotateImage = (src: cv.Mat, rotatedImage: cv.Mat, angle: number) => {
   const center = new cv.Point(src.cols / 2, src.rows / 2);
   const rotationMatrix = cv.getRotationMatrix2D(center, angle, 1.0);
   const newSize = new cv.Size(src.cols, src.rows);
-  const rotatedImage = new cv.Mat();
   cv.warpAffine(src, rotatedImage, rotationMatrix, newSize, cv.INTER_LINEAR);
 
-  return rotatedImage;
   rotationMatrix.delete();
-  rotatedImage.delete();
+  return rotatedImage;
 };
 
 const cropMrz = (
@@ -60,6 +58,7 @@ const cropMrz = (
   const closed = new cv.Mat();
   const erosion = new cv.Mat();
   const dilatation = new cv.Mat();
+  const rotatedImage = new cv.Mat();
 
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
   cv.morphologyEx(
@@ -81,12 +80,6 @@ const cropMrz = (
     blockSize,
     meanOffset
   );
-  // cv.morphologyEx(
-  //   thresh,
-  //   closed,
-  //   cv.MORPH_CLOSE,
-  //   cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(31, 3))
-  // );
 
   const erosionKernel = cv.getStructuringElement(
     cv.MORPH_RECT,
@@ -109,8 +102,6 @@ const cropMrz = (
     cv.RETR_EXTERNAL,
     cv.CHAIN_APPROX_SIMPLE
   );
-
-  const aspectRatioTolerance = 3;
 
   let largestContourIndex = -1;
   // let secondLargestContourIndex = -1;
@@ -157,7 +148,7 @@ const cropMrz = (
     let croppedImage = src.roi(combinedRect);
     outputCanvas.width = rect1.width;
     outputCanvas.height = rect1.height;
-    croppedImage = rotateImage(croppedImage, 0.5);
+    croppedImage = rotateImage(croppedImage, rotatedImage, 0.7);
     cv.imshow(outputCanvas, croppedImage);
 
     croppedImage.delete();
@@ -167,7 +158,7 @@ const cropMrz = (
 
   // Clean up
   src.delete();
-  // contrast.delete();
+  // rotatedImage.delete();
   dilatation.delete();
   erosion.delete();
   gray.delete();
@@ -260,12 +251,17 @@ function parseMrz(mrz: string) {
 }
 
 export async function extractMRZ(
-  imagePath: string,
+  croppedImageCanvas: HTMLCanvasElement,
   setMrz: any
-): Promise<Record<string, string>> {
-  const image: any = await preprocessImage(imagePath);
-  // const { data: { text } } = await Tesseract.recognize(imagePath, 'eng');
-  const worker: any = await createWorker({
+): Promise<string> {
+  // Convert canvas to Blob
+  const croppedImageBlob = await new Promise<Blob>((resolve) => {
+    croppedImageCanvas.toBlob((blob) => {
+      resolve(blob);
+    });
+  });
+
+  const worker = await createWorker({
     logger: (m) => console.log(m),
   });
   await worker.load();
@@ -274,19 +270,24 @@ export async function extractMRZ(
   await worker.setParameters({
     tessedit_char_whitelist: "<ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
   });
-  const bmp = await image.getBufferAsync(Jimp.MIME_BMP);
-  const bmpImage = new Blob([bmp]);
+
+  // Use the Blob as input for the Tesseract worker
   const {
     data: { text },
-  } = await worker.recognize(bmpImage);
+  } = await worker.recognize(croppedImageBlob);
   await worker.terminate();
-  // console.log(text.replace(/[\s]/g,''))
-  const passportData = parseMrz(text.replace(/[\s]/g, ""));
-  setMrz(passportData);
-  if (passportData) {
-    console.log(passportData);
-  } else {
-    console.log("Invalid MRZ");
+
+  console.log(text);
+  try {
+    const passportData = parseMrz(text.replace(/[\s]/g, ""));
+    setMrz(passportData);
+    if (passportData) {
+      console.log(passportData);
+    } else {
+      console.log("Invalid MRZ");
+    }
+  } catch (e) {
+    console.log(e);
   }
 
   return text.replace(/[\s\n]/g, "");

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useRef } from "react";
-import { loadImage } from "@/helper/tesseract";
-
+import { extractMRZ, loadImage } from "@/helper/tesseract";
+import { toast } from "react-toastify";
 interface ThumbsProps {
   file: any;
   setMrz: React.Dispatch<React.SetStateAction<string>>;
@@ -10,7 +10,10 @@ interface ThumbsProps {
 const Thumbs = ({ file, setMrz }: ThumbsProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const croppedCanvasRef = useRef<HTMLCanvasElement>(null);
-
+  function clearCanvas(canvas) {
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  }
   return (
     <div className="w-full relative mt-1">
       {file ? (
@@ -23,7 +26,18 @@ const Thumbs = ({ file, setMrz }: ThumbsProps) => {
           height={500}
           onLoad={async (e: any) => {
             URL.revokeObjectURL(file.preview);
-            loadImage(e, canvasRef, croppedCanvasRef);
+            clearCanvas(canvasRef.current);
+            await loadImage(e, canvasRef, croppedCanvasRef);
+            if (croppedCanvasRef.current) {
+              await toast.promise(
+                extractMRZ(croppedCanvasRef.current, setMrz),
+                {
+                  pending: "Extracting MRZ",
+                  success: "MRZ extracted",
+                  error: "Error extracting MRZ",
+                }
+              );
+            }
           }}
         />
       ) : (
