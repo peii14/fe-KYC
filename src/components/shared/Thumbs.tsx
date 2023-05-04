@@ -10,10 +10,7 @@ interface ThumbsProps {
 const Thumbs = ({ file, setMrz }: ThumbsProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const croppedCanvasRef = useRef<HTMLCanvasElement>(null);
-  function clearCanvas(canvas) {
-    const context = canvas.getContext("2d");
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  }
+
   return (
     <div className="w-full relative mt-1">
       {file ? (
@@ -26,7 +23,6 @@ const Thumbs = ({ file, setMrz }: ThumbsProps) => {
           height={500}
           onLoad={async (e: any) => {
             URL.revokeObjectURL(file.preview);
-            clearCanvas(canvasRef.current);
             await loadImage(e, canvasRef, croppedCanvasRef);
             if (croppedCanvasRef.current) {
               await toast.promise(

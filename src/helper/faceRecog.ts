@@ -39,7 +39,7 @@ export const findMatch = async ({
   handle,
   setBiometrics,
 }: findMatchProps) => {
-  const canvas2: any = document.getElementById("canvas2");
+  const canvas2: any = document.getElementById("canvas1");
   try {
     let matchScore = 0.5;
     // let secondImg = webCamFace;
@@ -58,15 +58,17 @@ export const findMatch = async ({
       let matched: any = [
         faces[results.findIndex((i: any) => i._label === "Face")],
       ];
-      //   matched = faceapi.resizeResults(matched, { height: 300, width: 300 });
-      //     faceapi.draw.drawDetections(document.getElementById("canvas2"), matched, {
-      //       withScore: false,
-      //     });
+
+      matched = faceapi.resizeResults(matched, { height: 300, width: 300 });
+      // faceapi.draw.drawDetections(document.getElementById("canvas1"), matched, {
+      //   withScore: false,
+      // });
 
       // console.log("LIVE",faces[0].descriptor)
       // console.log("PASSPORT",labledFace)
+
       setBiometrics([{ live: faces[0].descriptor }, { passport: labledFace }]);
-      faceapi.draw.drawFaceLandmarks(canvas2, matched);
+      // faceapi.draw.drawFaceLandmarks(canvas2, matched);
 
       //   this.closeWebcam();
       setMatch(true);
@@ -90,7 +92,10 @@ export const checkMatch = async ({
 
   const canvas1: any = document.getElementById("canvas1");
 
-  faces = faceapi.resizeResults(faces, { height: 150, width: 300 });
+  faces = faceapi.resizeResults(faces, {
+    height: canvas1.height,
+    width: canvas1.width,
+  });
   // faceapi.draw.drawDetections(canvas1, faces);
   faceapi.draw.drawFaceLandmarks(canvas1, faces);
   switch (faces.length) {
