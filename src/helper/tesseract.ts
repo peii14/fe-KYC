@@ -1,6 +1,8 @@
 import { createWorker } from "tesseract.js";
 import Jimp from "jimp-compact";
-import { toast } from "react-toastify";
+import * as cv from "@techstark/opencv-js";
+import { useRef } from "react";
+
 interface PassportData {
   documentType: string;
   documentSubType: string | null;
@@ -13,6 +15,168 @@ interface PassportData {
   expiryDate: string;
   personalNumber: string;
 }
+type MRZCroppingProps = {
+  onCropped?: (canvas: HTMLCanvasElement) => void;
+};
+type OnCroppedCallback = (canvas: HTMLCanvasElement) => void;
+
+export const loadImage = (
+  event: React.SyntheticEvent<HTMLImageElement, Event>,
+  canvasRef: React.RefObject<HTMLCanvasElement>,
+  croppedCanvasRef: React.RefObject<HTMLCanvasElement>
+) => {
+  const img = new Image();
+  img.src = event.currentTarget.src;
+  img.onload = () => {
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    cropMrz(canvas, croppedCanvasRef.current!);
+  };
+};
+
+const rotateImage = (src: cv.Mat, angle: number) => {
+  const center = new cv.Point(src.cols / 2, src.rows / 2);
+  const rotationMatrix = cv.getRotationMatrix2D(center, angle, 1.0);
+  const newSize = new cv.Size(src.cols, src.rows);
+  const rotatedImage = new cv.Mat();
+  cv.warpAffine(src, rotatedImage, rotationMatrix, newSize, cv.INTER_LINEAR);
+
+  return rotatedImage;
+  rotationMatrix.delete();
+  rotatedImage.delete();
+};
+
+const cropMrz = (
+  canvas: HTMLCanvasElement,
+  outputCanvas: HTMLCanvasElement
+) => {
+  const src = cv.imread(canvas);
+  const gray = new cv.Mat();
+  const blackhat = new cv.Mat();
+  const thresh = new cv.Mat();
+  const closed = new cv.Mat();
+  const erosion = new cv.Mat();
+  const dilatation = new cv.Mat();
+
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+  cv.morphologyEx(
+    gray,
+    blackhat,
+    cv.MORPH_BLACKHAT,
+    cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(21, 15))
+  );
+
+  const maxValue = 255;
+  const blockSize = 51;
+  const meanOffset = 30;
+  cv.adaptiveThreshold(
+    blackhat,
+    thresh,
+    maxValue,
+    cv.ADAPTIVE_THRESH_MEAN_C,
+    cv.THRESH_BINARY_INV,
+    blockSize,
+    meanOffset
+  );
+  // cv.morphologyEx(
+  //   thresh,
+  //   closed,
+  //   cv.MORPH_CLOSE,
+  //   cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(31, 3))
+  // );
+
+  const erosionKernel = cv.getStructuringElement(
+    cv.MORPH_RECT,
+    new cv.Size(1, 5)
+  );
+  cv.erode(thresh, erosion, erosionKernel);
+
+  const dilationKernel = cv.getStructuringElement(
+    cv.MORPH_DILATE,
+    new cv.Size(71, 21)
+  );
+  cv.dilate(erosion, dilatation, dilationKernel);
+
+  const contours = new cv.MatVector();
+  const hierarchy = new cv.Mat();
+  cv.findContours(
+    dilatation,
+    contours,
+    hierarchy,
+    cv.RETR_EXTERNAL,
+    cv.CHAIN_APPROX_SIMPLE
+  );
+
+  const aspectRatioTolerance = 3;
+
+  let largestContourIndex = -1;
+  // let secondLargestContourIndex = -1;
+  let largestArea = 0;
+  // let secondLargestArea = 0;
+  let largestAspectRatio = 0;
+
+  for (let i = 0; i < Number(contours.size()); i++) {
+    const contour = contours.get(i);
+    const area = cv.contourArea(contour);
+    const rect = cv.boundingRect(contour);
+    const aspectRatio = rect.width / rect.height;
+    if (area > largestArea && aspectRatio > 8 && aspectRatio < 20) {
+      // secondLargestArea = largestArea;
+      // secondLargestContourIndex = largestContourIndex;
+      largestArea = area;
+      largestContourIndex = i;
+      largestAspectRatio = aspectRatio;
+    }
+  }
+
+  // cv.imshow(outputCanvas, dilatation);
+
+  if (largestContourIndex >= 0) {
+    const rect1 = cv.boundingRect(contours.get(largestContourIndex));
+    const rect2 = cv.boundingRect(contours.get(largestContourIndex + 1));
+    const aspec1 = rect1.width / rect1.height;
+    const aspec2 = rect2.width / rect2.height;
+    console.log("largest area", largestArea);
+    console.log("aspec1", aspec1);
+    console.log("aspec2", aspec2);
+    // Combine second and third largest rectangles
+    const combinedRect = {
+      x: Math.min(rect1.x, rect2.x),
+      y: Math.min(rect1.y, rect2.y),
+      width:
+        Math.max(rect1.x + rect1.width, rect2.x + rect2.width) -
+        Math.min(rect1.x, rect2.x),
+      height:
+        Math.max(rect1.y + rect1.height, rect2.y + rect2.height) -
+        Math.min(rect1.y, rect2.y),
+    };
+
+    let croppedImage = src.roi(combinedRect);
+    outputCanvas.width = rect1.width;
+    outputCanvas.height = rect1.height;
+    croppedImage = rotateImage(croppedImage, 0.5);
+    cv.imshow(outputCanvas, croppedImage);
+
+    croppedImage.delete();
+  } else {
+    console.log("MRZ areas not found.");
+  }
+
+  // Clean up
+  src.delete();
+  // contrast.delete();
+  dilatation.delete();
+  erosion.delete();
+  gray.delete();
+  blackhat.delete();
+  thresh.delete();
+  closed.delete();
+  contours.delete();
+  hierarchy.delete();
+};
 
 export const reader = async (canvas) => {
   const ctx = canvas.getContext("2d");
@@ -46,12 +210,6 @@ async function preprocessImage(imagePath: string): Promise<Jimp> {
   image.crop(mrzX, mrzY, mrzWidth, mrzHeight);
   // image.rotate(20)
 
-  // const imageData = new ImageData(
-  //     Uint8ClampedArray.from(image.bitmap.data),
-  //     image.bitmap.width,
-  //     image.bitmap.height
-  // );
-  // ctx.putImageData(imageData, 0, 0);
   return image;
 }
 
@@ -107,7 +265,6 @@ export async function extractMRZ(
 ): Promise<Record<string, string>> {
   const image: any = await preprocessImage(imagePath);
   // const { data: { text } } = await Tesseract.recognize(imagePath, 'eng');
-
   const worker: any = await createWorker({
     logger: (m) => console.log(m),
   });

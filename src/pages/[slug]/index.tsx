@@ -30,10 +30,11 @@ function Customer({ wallet_address, fi }) {
       "image/*": [],
     },
     onDrop: async (acceptedFiles: any) => {
+      const uploadedFile = acceptedFiles[0];
       setFiles(
         acceptedFiles.map((file) =>
           Object.assign(file, {
-            preview: URL.createObjectURL(file),
+            preview: URL.createObjectURL(uploadedFile),
           })
         )
       );
