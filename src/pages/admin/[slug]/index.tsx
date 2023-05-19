@@ -58,11 +58,18 @@ const Admin = ({ bank_entity, fi }) => {
       },
       {
         optionName: "AML Status",
-        onClick: () =>
-          postIllicitScore(
-            props.props.designatedBank,
-            props.props.walletAddress,
-            financialInstitution[selectedFI]["mspid"]
+        onClick: async () =>
+          await toast.promise(
+            postIllicitScore(
+              props.props.designatedBank,
+              props.props.walletAddress,
+              financialInstitution[selectedFI]["mspid"]
+            ),
+            {
+              pending: "Loading...",
+              success: "Checking Success!",
+              error: "Error when checking illicit activities",
+            }
           ),
       },
     ];

@@ -23,17 +23,8 @@ const Thumbs = ({ file, setMrz }: ThumbsProps) => {
           height={500}
           onLoad={async (e: any) => {
             URL.revokeObjectURL(file.preview);
-            await loadImage(e, canvasRef, croppedCanvasRef);
-            if (croppedCanvasRef.current) {
-              await toast.promise(
-                extractMRZ(croppedCanvasRef.current, setMrz),
-                {
-                  pending: "Extracting MRZ",
-                  success: "MRZ extracted",
-                  error: "Error extracting MRZ",
-                }
-              );
-            }
+            await loadImage(e, canvasRef, croppedCanvasRef, setMrz);
+            
           }}
         />
       ) : (

@@ -52,7 +52,7 @@ const FaceRecognition = ({ passport, setBiometrics }: FaceRecognitionProps) => {
 
       if (matchFound) {
         setMatchDuration((prevDuration) => prevDuration + 33);
-        if (matchDuration >= 2000) {
+        if (matchDuration >= 500) {
           clearInterval(interval);
           console.log("match found");
           if (webcamRef.current && webcamRef.current.stream) {

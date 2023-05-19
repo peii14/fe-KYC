@@ -5,7 +5,22 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Card from "@/components/shared/Card";
 import { BsFillPatchCheckFill } from "react-icons/bs";
-const Customer = ({ wallet_address }) => {
+import { getUserProfile } from "@/lib/kyc";
+import CustomerStatus from "@/components/status/CustomerStatus";
+import AMLStatus from "@/components/status/AMLStatus";
+
+interface CustomerProps {
+  wallet_address: string;
+  userInformation: UserInformation;
+}
+interface UserInformation {
+  AMLFlag: string;
+  designatedBank: string;
+  status: string;
+  timestamp: string;
+}
+
+const Customer = ({ wallet_address, userInformation }: CustomerProps) => {
   const { address } = useWeb3();
   const router = useRouter();
   const [isAuth, setAuth] = useState(false);
@@ -28,8 +43,16 @@ const Customer = ({ wallet_address }) => {
                 <h1>View Customer Status</h1>
                 <div className="flex items-center space-x-2">
                   <BsFillPatchCheckFill />
-                  <p>Validation by {}</p>
+                  <p>Validation by {userInformation.designatedBank}</p>
                 </div>
+              </div>
+              <div className="mt-5 gap-5 grid grid-cols-2">
+                <p>Customer Status</p>
+                <CustomerStatus status={userInformation.status} />
+                <p>AML Flag</p>
+                <AMLStatus status={userInformation.AMLFlag} />
+                <p>Timestamp</p>
+                <p>{new Date(userInformation.timestamp).toString()}</p>
               </div>
             </Card>
           </section>
@@ -42,8 +65,10 @@ const Customer = ({ wallet_address }) => {
 export const getServerSideProps = async ({ params }) => {
   const wallet_address = params.slug;
   // check wallet address
+  const user = await getUserProfile(wallet_address, wallet_address);
+  console.log(user);
   return {
-    props: { wallet_address },
+    props: { wallet_address, userInformation: JSON.parse(user) },
   };
 };
 export default Customer;

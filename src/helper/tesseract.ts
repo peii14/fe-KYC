@@ -1,7 +1,7 @@
 import { createWorker } from "tesseract.js";
 import Jimp from "jimp-compact";
 import * as cv from "@techstark/opencv-js";
-import { useRef } from "react";
+import { toast } from "react-toastify";
 
 interface PassportData {
   documentType: string;
@@ -23,18 +23,31 @@ type OnCroppedCallback = (canvas: HTMLCanvasElement) => void;
 export const loadImage = async (
   event: React.SyntheticEvent<HTMLImageElement, Event>,
   canvasRef: React.RefObject<HTMLCanvasElement>,
-  croppedCanvasRef: React.RefObject<HTMLCanvasElement>
+  croppedCanvasRef: React.RefObject<HTMLCanvasElement>,
+  setMrz: React.Dispatch<React.SetStateAction<String | null>>
 ) => {
   const img = new Image();
   img.src = event.currentTarget.src;
-  img.onload = () => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0, img.width, img.height);
-    cropMrz(canvas, croppedCanvasRef.current!);
-  };
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => {
+      const canvas = canvasRef.current!;
+      const ctx = canvas.getContext("2d")!;
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0, img.width, img.height);
+      cropMrz(canvas, croppedCanvasRef.current!);
+      resolve();
+    };
+    img.onerror = reject;
+  });
+
+  if (croppedCanvasRef.current) {
+    await toast.promise(extractMRZ(croppedCanvasRef.current, setMrz), {
+      pending: "Extracting MRZ",
+      success: "MRZ extracted",
+      error: "Error extracting MRZ",
+    });
+  }
 };
 
 const rotateImage = (src: cv.Mat, rotatedImage: cv.Mat, angle: number) => {
@@ -288,6 +301,9 @@ export async function extractMRZ(
     }
   } catch (e) {
     console.log(e);
+  }
+  if (text.length < 1) {
+    throw new Error("No text found");
   }
 
   return text.replace(/[\s\n]/g, "");
